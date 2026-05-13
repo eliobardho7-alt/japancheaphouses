@@ -1,0 +1,51 @@
+export const communityCategories = [
+  {
+    id: 'newcomers',
+    name: 'Newcomers',
+    description: 'New to Japan real estate? Start here and ask anything!',
+    icon: '👋',
+    color: 'bg-blue-50 border-blue-200',
+  },
+  {
+    id: 'homeowners',
+    name: 'Homeowners',
+    description: 'Share your experiences and tips with fellow property owners.',
+    icon: '🏡',
+    color: 'bg-green-50 border-green-200',
+  },
+  {
+    id: 'potential-purchases',
+    name: 'Potential Purchases',
+    description: 'Get feedback on properties you are considering buying.',
+    icon: '🔍',
+    color: 'bg-yellow-50 border-yellow-200',
+  },
+  {
+    id: 'repairs',
+    name: 'Renovations & Repairs',
+    description: 'Discuss renovation projects, DIY tips, and contractor recommendations.',
+    icon: '🔨',
+    color: 'bg-orange-50 border-orange-200',
+  },
+  {
+    id: 'investments',
+    name: 'Investment Strategy',
+    description: 'Discuss ROI, rental yields, market trends, and investment approaches.',
+    icon: '📈',
+    color: 'bg-purple-50 border-purple-200',
+  },
+  {
+    id: 'legal-tax',
+    name: 'Legal & Tax',
+    description: 'Questions about ownership laws, taxes, and legal requirements.',
+    icon: '⚖️',
+    color: 'bg-red-50 border-red-200',
+  },
+  {
+    id: 'general',
+    name: 'General Discussion',
+    description: "Everything else - introduce yourself, share photos, or just chat!",
+    icon: '💬',
+    color: 'bg-gray-50 border-gray-200',
+  },
+];
