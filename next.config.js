@@ -12,6 +12,8 @@ const nextConfig = {
       },
     ],
   },
+  // Required for Stripe to work correctly in Next.js API routes
+  serverExternalPackages: ['stripe'],
 };
 
 module.exports = nextConfig;

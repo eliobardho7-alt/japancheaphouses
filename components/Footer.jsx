@@ -13,11 +13,15 @@ export default function Footer() {
     e.preventDefault();
     setStatus('loading');
 
-    // TODO: Connect to your Supabase newsletter table or email service
-    // For now, this just simulates the action
     try {
-      // Example: await supabase.from('newsletter_subscribers').insert({ email });
-      await new Promise((resolve) => setTimeout(resolve, 800));
+      const res = await fetch('/api/newsletter', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      });
+
+      if (!res.ok) throw new Error('Failed to subscribe');
+
       setStatus('success');
       setEmail('');
       setTimeout(() => setStatus(''), 3000);
