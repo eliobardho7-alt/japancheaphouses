@@ -11,30 +11,35 @@ export async function POST(request) {
     return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
   }
 
-  if (!process.env.STRIPE_SECRET_KEY) {
-    console.error('STRIPE_SECRET_KEY is not set');
-    return NextResponse.json(
-      { error: 'Stripe not configured. Add STRIPE_SECRET_KEY to Vercel environment variables.' },
-      { status: 500 }
-    );
-  }
-  if (!process.env.STRIPE_PRICE_ID) {
-    console.error('STRIPE_PRICE_ID is not set');
-    return NextResponse.json(
-      { error: 'Stripe price not configured. Add STRIPE_PRICE_ID to Vercel environment variables.' },
-      { status: 500 }
-    );
-  }
-
   // CRITICAL: identify the user from the server-side session, NOT the request body.
   // Without this, anyone can assign a paid subscription to any user_id.
-  const supabase = getServerSupabase();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  let supabase;
+  try {
+    supabase = await getServerSupabase();
+  } catch (error) {
+    console.error('Supabase auth client error:', error.message);
+    return NextResponse.json({ error: 'Authentication service unavailable' }, { status: 503 });
+  }
+  let user;
+  try {
+    const result = await supabase.auth.getUser();
+    user = result.data.user;
+  } catch (error) {
+    console.error('Supabase auth lookup error:', error.message);
+    return NextResponse.json({ error: 'Authentication service unavailable' }, { status: 503 });
+  }
 
   if (!user) {
     return NextResponse.json({ error: 'Please sign in to subscribe.' }, { status: 401 });
+  }
+
+  if (!process.env.STRIPE_SECRET_KEY) {
+    console.error('STRIPE_SECRET_KEY is not set');
+    return NextResponse.json({ error: 'Checkout is not configured' }, { status: 503 });
+  }
+  if (!process.env.STRIPE_PRICE_ID) {
+    console.error('STRIPE_PRICE_ID is not set');
+    return NextResponse.json({ error: 'Checkout is not configured' }, { status: 503 });
   }
 
   const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
