@@ -40,10 +40,8 @@ const nextConfig = {
       },
     ],
   },
-  // Required for Stripe to work correctly in Next.js API routes (Next 14 syntax)
-  experimental: {
-    serverComponentsExternalPackages: ['stripe'],
-  },
+  // Required for Stripe to work correctly in Next.js API routes
+  serverExternalPackages: ['stripe'],
   poweredByHeader: false,
   async headers() {
     return [
