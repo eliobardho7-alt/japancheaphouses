@@ -1,6 +1,9 @@
 import { NextResponse } from 'next/server';
 import { requireAdmin, getServiceSupabase } from '@/lib/supabase-server';
 
+// Always run on request; never prerender (depends on cookies + env at runtime)
+export const dynamic = 'force-dynamic';
+
 export async function GET() {
   const auth = await requireAdmin();
   if (auth.error) return NextResponse.json({ error: auth.error }, { status: auth.status });

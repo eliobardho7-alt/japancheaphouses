@@ -1,6 +1,9 @@
 import { NextResponse } from 'next/server';
 import { requireAdmin, getServiceSupabase } from '@/lib/supabase-server';
 
+// Always run on request; never prerender (depends on cookies + env at runtime)
+export const dynamic = 'force-dynamic';
+
 const ALLOWED_STATUSES = ['pending', 'confirmed', 'completed', 'cancelled'];
 
 export async function GET() {
