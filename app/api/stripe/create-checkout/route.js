@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { getServerSupabase } from '@/lib/supabase-server';
 import { rateLimit } from '@/lib/rate-limit';
+import { getSiteUrl } from '@/lib/site-url';
 
 export async function POST(request) {
   // Rate limit checkout creation
@@ -39,7 +40,7 @@ export async function POST(request) {
   const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
   try {
-    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://japancheaphouses.vercel.app';
+    const siteUrl = getSiteUrl();
 
     const session = await stripe.checkout.sessions.create({
       mode: 'subscription',
