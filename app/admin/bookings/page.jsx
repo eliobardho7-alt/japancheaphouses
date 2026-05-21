@@ -3,41 +3,43 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, Calendar, Mail, Phone, MessageSquare } from 'lucide-react';
-import { supabase, getCurrentUser } from '@/lib/supabase';
-
-const ADMIN_EMAIL = 'eliobardho7@gmail.com';
+import { ArrowLeft, Calendar, Mail, Phone } from 'lucide-react';
 
 export default function AdminBookingsPage() {
   const router = useRouter();
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
   useEffect(() => {
-    checkAuth();
-  }, []);
-
-  const checkAuth = async () => {
-    const currentUser = await getCurrentUser();
-    if (!currentUser || currentUser.email !== ADMIN_EMAIL) {
-      router.push('/login');
-      return;
-    }
-
-    if (supabase) {
-      const { data } = await supabase
-        .from('bookings')
-        .select('*')
-        .order('created_at', { ascending: false });
-      if (data) setBookings(data);
-    }
-    setLoading(false);
-  };
+    (async () => {
+      try {
+        const res = await fetch('/api/admin/bookings', { cache: 'no-store' });
+        if (res.status === 401 || res.status === 403) {
+          router.push('/login');
+          return;
+        }
+        const data = await res.json();
+        setBookings(data.bookings || []);
+      } catch (e) {
+        setError('Failed to load bookings');
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, [router]);
 
   const updateStatus = async (id, status) => {
-    if (supabase) {
-      await supabase.from('bookings').update({ status }).eq('id', id);
+    const res = await fetch('/api/admin/bookings', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id, status }),
+    });
+    if (res.ok) {
       setBookings(bookings.map((b) => (b.id === id ? { ...b, status } : b)));
+    } else {
+      const { error: msg } = await res.json().catch(() => ({}));
+      setError(msg || 'Failed to update');
     }
   };
 
@@ -52,34 +54,26 @@ export default function AdminBookingsPage() {
   return (
     <div className="pt-24 min-h-screen bg-brand-light">
       <div className="container-custom py-12">
-        <Link
-          href="/admin"
-          className="inline-flex items-center text-sm text-brand-gray hover:text-brand-accent mb-6"
-        >
+        <Link href="/admin" className="inline-flex items-center text-sm text-brand-gray hover:text-brand-accent mb-6">
           <ArrowLeft className="h-4 w-4 mr-1" />
           Back to Dashboard
         </Link>
 
         <h1 className="font-serif text-4xl text-brand mb-8">Booking Requests</h1>
 
-        {!supabase && (
-          <div className="bg-yellow-50 border border-yellow-200 p-4 mb-6 text-sm text-yellow-800">
-            ⚠️ Supabase is not configured yet. Bookings are only sent via email. See README.md for setup.
-          </div>
+        {error && (
+          <div className="bg-red-50 border border-red-200 text-red-700 text-sm p-3 mb-6">{error}</div>
         )}
 
         {bookings.length === 0 ? (
           <div className="bg-white border border-brand-border p-12 text-center">
             <Calendar className="h-12 w-12 text-brand-gray mx-auto mb-4" />
-            <p className="text-brand-gray">No bookings yet. They'll appear here when customers book.</p>
+            <p className="text-brand-gray">No bookings yet. They&apos;ll appear here when customers book.</p>
           </div>
         ) : (
           <div className="space-y-4">
             {bookings.map((booking) => (
-              <div
-                key={booking.id}
-                className="bg-white border border-brand-border p-6"
-              >
+              <div key={booking.id} className="bg-white border border-brand-border p-6">
                 <div className="flex flex-wrap items-start justify-between gap-4 mb-4">
                   <div>
                     <h3 className="font-serif text-xl text-brand">{booking.full_name}</h3>
@@ -116,9 +110,7 @@ export default function AdminBookingsPage() {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
                   <div className="flex items-center gap-2 text-brand-gray">
                     <Mail className="h-4 w-4" />
-                    <a href={`mailto:${booking.email}`} className="hover:text-brand-accent">
-                      {booking.email}
-                    </a>
+                    <a href={`mailto:${booking.email}`} className="hover:text-brand-accent">{booking.email}</a>
                   </div>
                   {booking.phone && (
                     <div className="flex items-center gap-2 text-brand-gray">
