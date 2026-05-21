@@ -4,21 +4,26 @@ import Link from 'next/link';
 import { Check, X } from 'lucide-react';
 
 export default function PricingPage() {
+  // Server now identifies the user from the Supabase session cookie.
+  // We never send userId or email from the client.
   const handleSubscribe = async () => {
     try {
       const response = await fetch('/api/stripe/create-checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email: '', // TODO: Get from logged-in user (Supabase auth)
-          userId: '',
-        }),
+        body: JSON.stringify({}),
       });
+
+      if (response.status === 401) {
+        // Not signed in — send them through signup, then back to /pricing
+        window.location.href = '/signup?next=/pricing';
+        return;
+      }
 
       const data = await response.json();
 
       if (data.error) {
-        alert('Stripe is not set up yet. Please follow the setup guide in README.md');
+        alert(data.error);
         return;
       }
 
@@ -77,7 +82,6 @@ export default function PricingPage() {
     <div className="pt-24">
       <section className="section-padding bg-white">
         <div className="container-custom">
-          {/* Header */}
           <div className="text-center mb-16">
             <h1 className="font-serif text-5xl md:text-6xl text-brand mb-4">
               Plans & Pricing
@@ -87,7 +91,6 @@ export default function PricingPage() {
             </p>
           </div>
 
-          {/* Plans */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
             {plans.map((plan) => (
               <div
@@ -104,34 +107,18 @@ export default function PricingPage() {
                   </span>
                 )}
 
-                <h2
-                  className={`font-serif text-3xl mb-2 ${
-                    plan.featured ? 'text-white' : 'text-brand'
-                  }`}
-                >
+                <h2 className={`font-serif text-3xl mb-2 ${plan.featured ? 'text-white' : 'text-brand'}`}>
                   {plan.name}
                 </h2>
-                <p
-                  className={`text-sm mb-6 ${
-                    plan.featured ? 'text-white/80' : 'text-brand-gray'
-                  }`}
-                >
+                <p className={`text-sm mb-6 ${plan.featured ? 'text-white/80' : 'text-brand-gray'}`}>
                   {plan.description}
                 </p>
 
                 <div className="mb-6">
-                  <span
-                    className={`text-5xl font-serif ${
-                      plan.featured ? 'text-white' : 'text-brand'
-                    }`}
-                  >
+                  <span className={`text-5xl font-serif ${plan.featured ? 'text-white' : 'text-brand'}`}>
                     ${plan.price}
                   </span>
-                  <span
-                    className={`text-sm ml-2 ${
-                      plan.featured ? 'text-white/80' : 'text-brand-gray'
-                    }`}
-                  >
+                  <span className={`text-sm ml-2 ${plan.featured ? 'text-white/80' : 'text-brand-gray'}`}>
                     {plan.period}
                   </span>
                 </div>
@@ -140,17 +127,9 @@ export default function PricingPage() {
                   {plan.features.map((feature, idx) => (
                     <li key={idx} className="flex items-start text-sm">
                       {feature.included ? (
-                        <Check
-                          className={`h-5 w-5 mr-3 mt-0.5 flex-shrink-0 ${
-                            plan.featured ? 'text-white' : 'text-brand-accent'
-                          }`}
-                        />
+                        <Check className={`h-5 w-5 mr-3 mt-0.5 flex-shrink-0 ${plan.featured ? 'text-white' : 'text-brand-accent'}`} />
                       ) : (
-                        <X
-                          className={`h-5 w-5 mr-3 mt-0.5 flex-shrink-0 ${
-                            plan.featured ? 'text-white/40' : 'text-gray-300'
-                          }`}
-                        />
+                        <X className={`h-5 w-5 mr-3 mt-0.5 flex-shrink-0 ${plan.featured ? 'text-white/40' : 'text-gray-300'}`} />
                       )}
                       <span
                         className={
@@ -189,7 +168,6 @@ export default function PricingPage() {
             ))}
           </div>
 
-          {/* FAQ */}
           <div className="max-w-3xl mx-auto mt-24">
             <h2 className="font-serif text-3xl text-brand text-center mb-12">
               Frequently Asked Questions

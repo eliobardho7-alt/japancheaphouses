@@ -44,8 +44,7 @@ export default function Navbar() {
     >
       <nav className="container-custom">
         <div className="flex items-center justify-between h-20">
-          {/* Logo */}
-          <Link href="/" className="flex items-center">
+          <Link href="/" className="flex items-center" aria-label="Yama Vista home">
             <Image
               src="/logo.png"
               alt="Yama Vista"
@@ -56,7 +55,6 @@ export default function Navbar() {
             />
           </Link>
 
-          {/* Desktop Navigation */}
           <div className="hidden lg:flex items-center space-x-8">
             {navLinks.map((link) => (
               <Link
@@ -68,7 +66,6 @@ export default function Navbar() {
               </Link>
             ))}
 
-            {/* More Dropdown */}
             <div
               className="relative"
               onMouseEnter={() => setShowMoreMenu(true)}
@@ -104,13 +101,10 @@ export default function Navbar() {
               )}
             </div>
 
-            {/* Language Selector */}
-            <select className="text-sm border border-brand-border px-3 py-1.5 bg-white text-brand cursor-pointer hover:border-brand transition-base">
-              <option value="en">EN</option>
-              <option value="ja">JP</option>
-            </select>
+            {/* Language switcher removed — it didn't actually switch languages.
+                Reintroduce when next-intl (or similar) is wired up with real
+                /en + /ja routes and proper hreflang alternates. */}
 
-            {/* Login / Account */}
             <Link
               href="/login"
               className="flex items-center text-sm font-medium text-brand hover:text-brand-accent transition-base"
@@ -120,7 +114,6 @@ export default function Navbar() {
             </Link>
           </div>
 
-          {/* Mobile menu button */}
           <button
             className="lg:hidden p-2"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
@@ -130,7 +123,6 @@ export default function Navbar() {
           </button>
         </div>
 
-        {/* Mobile Navigation */}
         {isMenuOpen && (
           <div className="lg:hidden border-t border-brand-border py-4 animate-slide-down">
             <div className="flex flex-col space-y-3">

@@ -1,12 +1,26 @@
 import { NextResponse } from 'next/server';
+import { escapeHtml, sanitizeHeader, isValidEmail } from '@/lib/escape-html';
+import { rateLimit } from '@/lib/rate-limit';
 
 export async function POST(request) {
-  try {
-    const { email } = await request.json();
+  const rl = rateLimit(request, { key: 'newsletter', limit: 5, windowMs: 60_000 });
+  if (!rl.ok) {
+    return NextResponse.json(
+      { error: 'Too many requests. Please try again later.' },
+      { status: 429, headers: { 'Retry-After': String(Math.ceil((rl.resetAt - Date.now()) / 1000)) } }
+    );
+  }
 
-    if (!email || !email.includes('@')) {
+  try {
+    const body = await request.json();
+    const { email, website } = body || {};
+    if (website) return NextResponse.json({ success: true }); // honeypot
+
+    if (!email || !isValidEmail(email)) {
       return NextResponse.json({ error: 'Valid email required' }, { status: 400 });
     }
+
+    const normalized = String(email).trim().slice(0, 254).toLowerCase();
 
     // Save to Supabase newsletter_subscribers table
     if (process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY) {
@@ -15,23 +29,16 @@ export async function POST(request) {
         process.env.NEXT_PUBLIC_SUPABASE_URL,
         process.env.SUPABASE_SERVICE_ROLE_KEY
       );
-
       const { error } = await supabase
         .from('newsletter_subscribers')
-        .upsert({ email, created_at: new Date().toISOString() }, { onConflict: 'email' });
-
-      if (error) {
-        console.error('Newsletter Supabase error:', error);
-        // Don't fail — still try to send confirmation
-      }
+        .upsert({ email: normalized, created_at: new Date().toISOString() }, { onConflict: 'email' });
+      if (error) console.error('Newsletter Supabase error:', error);
     }
 
-    // Send welcome email via Resend
+    // Notify admin
     if (process.env.RESEND_API_KEY) {
-      const adminEmail = process.env.NEXT_PUBLIC_CONTACT_EMAIL || 'eliobardho7@gmail.com';
+      const adminEmail = process.env.ADMIN_EMAIL || process.env.NEXT_PUBLIC_CONTACT_EMAIL || 'eliobardho7@gmail.com';
       const fromAddress = process.env.RESEND_FROM_EMAIL || 'onboarding@resend.dev';
-
-      // Notify admin
       await fetch('https://api.resend.com/emails', {
         method: 'POST',
         headers: {
@@ -39,10 +46,10 @@ export async function POST(request) {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          from: `Yama Vista <${fromAddress}>`,
-          to: [adminEmail],
-          subject: `New Newsletter Subscriber: ${email}`,
-          html: `<p>New subscriber: <strong>${email}</strong></p>`,
+          from: `Yama Vista <${sanitizeHeader(fromAddress)}>`,
+          to: [sanitizeHeader(adminEmail)],
+          subject: sanitizeHeader(`New Newsletter Subscriber: ${normalized}`),
+          html: `<p>New subscriber: <strong>${escapeHtml(normalized)}</strong></p>`,
         }),
       });
     }

@@ -4,92 +4,74 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Plus, Edit2, Trash2, ArrowLeft, Save, X, Lock, Eye } from 'lucide-react';
-import { supabase, getCurrentUser } from '@/lib/supabase';
-import { blogPosts as initialBlogs } from '@/data/blogs';
 
-const ADMIN_EMAIL = 'eliobardho7@gmail.com';
+const emptyPost = () => ({
+  title: '',
+  slug: '',
+  category: 'Guides',
+  excerpt: '',
+  content: '',
+  isPremium: false,
+  author: 'Elio Bardho',
+  date: new Date().toISOString().split('T')[0],
+  readTime: '2 min read',
+  tags: [],
+});
 
 export default function AdminBlogsPage() {
   const router = useRouter();
-  const [user, setUser] = useState(null);
-  const [posts, setPosts] = useState(initialBlogs);
+  const [posts, setPosts] = useState([]);
   const [editingPost, setEditingPost] = useState(null);
   const [isCreating, setIsCreating] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
-  useEffect(() => {
-    checkAuth();
-  }, []);
-
-  const checkAuth = async () => {
-    const currentUser = await getCurrentUser();
-    if (!currentUser || currentUser.email !== ADMIN_EMAIL) {
+  const load = async () => {
+    const res = await fetch('/api/admin/blogs', { cache: 'no-store' });
+    if (res.status === 401 || res.status === 403) {
       router.push('/login');
       return;
     }
-    setUser(currentUser);
-
-    // Load from Supabase if configured
-    if (supabase) {
-      const { data } = await supabase
-        .from('blog_posts')
-        .select('*')
-        .order('date', { ascending: false });
-      if (data && data.length > 0) setPosts(data);
-    }
-    setLoading(false);
+    const data = await res.json();
+    setPosts(data.posts || []);
   };
 
-  const emptyPost = {
-    title: '',
-    slug: '',
-    category: 'Guides',
-    excerpt: '',
-    content: '',
-    isPremium: false,
-    author: 'Elio Bardho',
-    date: new Date().toISOString().split('T')[0],
-    readTime: '2 min read',
-    tags: [],
-  };
+  useEffect(() => {
+    (async () => {
+      try {
+        await load();
+      } finally {
+        setLoading(false);
+      }
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleSave = async (post) => {
-    const slug =
-      post.slug || post.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
-    const postToSave = { ...post, slug };
-
-    if (supabase) {
-      if (isCreating) {
-        await supabase.from('blog_posts').insert(postToSave);
-      } else {
-        await supabase.from('blog_posts').update(postToSave).eq('id', post.id);
-      }
-
-      // Reload
-      const { data } = await supabase
-        .from('blog_posts')
-        .select('*')
-        .order('date', { ascending: false });
-      if (data) setPosts(data);
-    } else {
-      // No Supabase: just update local state
-      if (isCreating) {
-        setPosts([{ ...postToSave, id: Date.now() }, ...posts]);
-      } else {
-        setPosts(posts.map((p) => (p.id === post.id ? postToSave : p)));
-      }
-      alert('Note: Without Supabase, changes are not saved permanently. Set up Supabase in README.md to enable persistence.');
+    setError('');
+    const method = isCreating ? 'POST' : 'PUT';
+    const res = await fetch('/api/admin/blogs', {
+      method,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(post),
+    });
+    if (!res.ok) {
+      const { error: msg } = await res.json().catch(() => ({}));
+      setError(msg || 'Failed to save');
+      return;
     }
-
+    await load();
     setEditingPost(null);
     setIsCreating(false);
   };
 
   const handleDelete = async (id) => {
     if (!confirm('Are you sure you want to delete this post?')) return;
-
-    if (supabase) {
-      await supabase.from('blog_posts').delete().eq('id', id);
+    const res = await fetch(`/api/admin/blogs?id=${encodeURIComponent(id)}`, { method: 'DELETE' });
+    if (!res.ok) {
+      const { error: msg } = await res.json().catch(() => ({}));
+      setError(msg || 'Failed to delete');
+      return;
     }
     setPosts(posts.filter((p) => p.id !== id));
   };
@@ -105,12 +87,13 @@ export default function AdminBlogsPage() {
   if (editingPost || isCreating) {
     return (
       <BlogEditor
-        post={editingPost || emptyPost}
+        post={editingPost || emptyPost()}
         onSave={handleSave}
         onCancel={() => {
           setEditingPost(null);
           setIsCreating(false);
         }}
+        error={error}
       />
     );
   }
@@ -118,34 +101,26 @@ export default function AdminBlogsPage() {
   return (
     <div className="pt-24 min-h-screen bg-brand-light">
       <div className="container-custom py-12">
-        <Link
-          href="/admin"
-          className="inline-flex items-center text-sm text-brand-gray hover:text-brand-accent mb-6"
-        >
+        <Link href="/admin" className="inline-flex items-center text-sm text-brand-gray hover:text-brand-accent mb-6">
           <ArrowLeft className="h-4 w-4 mr-1" />
           Back to Dashboard
         </Link>
 
         <div className="flex items-center justify-between mb-8">
           <h1 className="font-serif text-4xl text-brand">Manage Blog Posts</h1>
-          <button
-            onClick={() => setIsCreating(true)}
-            className="btn-primary flex items-center gap-2"
-          >
+          <button onClick={() => setIsCreating(true)} className="btn-primary flex items-center gap-2">
             <Plus className="h-4 w-4" />
             New Post
           </button>
         </div>
 
-        {!supabase && (
-          <div className="bg-yellow-50 border border-yellow-200 p-4 mb-6 text-sm text-yellow-800">
-            ⚠️ Supabase is not configured yet. Changes won't be saved permanently. See README.md for setup instructions.
-          </div>
+        {error && (
+          <div className="bg-red-50 border border-red-200 text-red-700 text-sm p-3 mb-6">{error}</div>
         )}
 
         <div className="bg-white border border-brand-border">
           {posts.length === 0 ? (
-            <p className="p-8 text-center text-brand-gray">No blog posts yet. Click "New Post" to create one.</p>
+            <p className="p-8 text-center text-brand-gray">No blog posts yet. Click &quot;New Post&quot; to create one.</p>
           ) : (
             <table className="w-full">
               <thead className="bg-brand-light">
@@ -172,26 +147,13 @@ export default function AdminBlogsPage() {
                     <td className="p-4 text-sm text-brand-gray">{post.date}</td>
                     <td className="p-4 text-right">
                       <div className="flex justify-end gap-2">
-                        <Link
-                          href={`/blog/${post.slug}`}
-                          target="_blank"
-                          className="text-brand-gray hover:text-brand-accent"
-                          title="View"
-                        >
+                        <Link href={`/blog/${post.slug}`} target="_blank" className="text-brand-gray hover:text-brand-accent" title="View">
                           <Eye className="h-4 w-4" />
                         </Link>
-                        <button
-                          onClick={() => setEditingPost(post)}
-                          className="text-brand-gray hover:text-brand-accent"
-                          title="Edit"
-                        >
+                        <button onClick={() => setEditingPost(post)} className="text-brand-gray hover:text-brand-accent" title="Edit">
                           <Edit2 className="h-4 w-4" />
                         </button>
-                        <button
-                          onClick={() => handleDelete(post.id)}
-                          className="text-brand-gray hover:text-red-600"
-                          title="Delete"
-                        >
+                        <button onClick={() => handleDelete(post.id)} className="text-brand-gray hover:text-red-600" title="Delete">
                           <Trash2 className="h-4 w-4" />
                         </button>
                       </div>
@@ -207,23 +169,22 @@ export default function AdminBlogsPage() {
   );
 }
 
-function BlogEditor({ post, onSave, onCancel }) {
+function BlogEditor({ post, onSave, onCancel, error }) {
   const [form, setForm] = useState(post);
 
   return (
     <div className="pt-24 min-h-screen bg-brand-light">
       <div className="container-custom py-12 max-w-4xl">
-        <button
-          onClick={onCancel}
-          className="inline-flex items-center text-sm text-brand-gray hover:text-brand-accent mb-6"
-        >
+        <button onClick={onCancel} className="inline-flex items-center text-sm text-brand-gray hover:text-brand-accent mb-6">
           <ArrowLeft className="h-4 w-4 mr-1" />
           Back to Blog List
         </button>
 
-        <h1 className="font-serif text-3xl text-brand mb-8">
-          {post.id ? 'Edit Blog Post' : 'New Blog Post'}
-        </h1>
+        <h1 className="font-serif text-3xl text-brand mb-8">{post.id ? 'Edit Blog Post' : 'New Blog Post'}</h1>
+
+        {error && (
+          <div className="bg-red-50 border border-red-200 text-red-700 text-sm p-3 mb-4">{error}</div>
+        )}
 
         <div className="bg-white border border-brand-border p-8 space-y-5">
           <div>
@@ -279,19 +240,6 @@ function BlogEditor({ post, onSave, onCancel }) {
               value={form.content}
               onChange={(e) => setForm({ ...form, content: e.target.value })}
               className="w-full px-3 py-2 border border-brand-border resize-none font-mono text-sm"
-              placeholder={`Write your blog post here. Use ## for headings.
-
-Example:
-
-## Introduction
-
-This is the introduction paragraph.
-
-## Main Points
-
-1. First point
-2. Second point
-3. Third point`}
             />
           </div>
 

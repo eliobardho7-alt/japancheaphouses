@@ -1,7 +1,9 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import { MapPin, ArrowLeft, Lock, Home, Calendar } from 'lucide-react';
 import { listings, getListingBySlug } from '@/data/listings';
+import { realEstateListingJsonLd, breadcrumbList } from '@/lib/jsonld';
 
 export async function generateStaticParams() {
   return listings.map((listing) => ({ slug: listing.slug }));
@@ -11,27 +13,54 @@ export async function generateMetadata({ params }) {
   const listing = getListingBySlug(params.slug);
   if (!listing) return {};
 
+  const url = `/listings/${listing.slug}`;
+  const image = listing.coverImage || '/og-image.jpg';
+
   return {
-    title: `${listing.title} | Yama Vista`,
+    title: `${listing.title} — ${listing.location} ${listing.price}`,
     description: listing.excerpt,
+    alternates: { canonical: url },
+    openGraph: {
+      type: 'website',
+      title: listing.title,
+      description: listing.excerpt,
+      url,
+      images: [{ url: image, alt: listing.title }],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: listing.title,
+      description: listing.excerpt,
+      images: [image],
+    },
   };
 }
 
 export default function ListingDetailPage({ params }) {
   const listing = getListingBySlug(params.slug);
-
-  if (!listing) {
-    notFound();
-  }
+  if (!listing) notFound();
 
   // TODO: Check user subscription status server-side
   const isSubscribed = false;
   const showFullContent = !listing.isPremium || isSubscribed;
 
+  const jsonLd = [
+    realEstateListingJsonLd(listing),
+    breadcrumbList([
+      { name: 'Home', path: '/' },
+      { name: 'Listings', path: '/listings' },
+      { name: listing.title, path: `/listings/${listing.slug}` },
+    ]),
+  ];
+
   return (
     <article className="pt-24">
+      <script
+        type="application/ld+json"
+        // eslint-disable-next-line react/no-danger
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <div className="container-custom max-w-4xl py-12">
-        {/* Back link */}
         <Link
           href="/listings"
           className="inline-flex items-center text-sm text-brand-gray hover:text-brand-accent transition-base mb-8"
@@ -40,7 +69,6 @@ export default function ListingDetailPage({ params }) {
           Back to all listings
         </Link>
 
-        {/* Header */}
         <header className="mb-8">
           {listing.isPremium ? (
             <span className="inline-flex items-center gap-1 text-xs text-white bg-brand-accent px-2 py-1 mb-3">
@@ -82,12 +110,21 @@ export default function ListingDetailPage({ params }) {
           </div>
         </header>
 
-        {/* Featured Image */}
-        <div className="relative aspect-video bg-gradient-to-br from-gray-200 to-gray-300 mb-12 flex items-center justify-center">
-          <span className="text-8xl opacity-30">🏡</span>
+        <div className="relative aspect-video bg-gradient-to-br from-gray-200 to-gray-300 mb-12 flex items-center justify-center overflow-hidden">
+          {listing.coverImage ? (
+            <Image
+              src={listing.coverImage}
+              alt={`${listing.title} — ${listing.location}`}
+              fill
+              className="object-cover"
+              sizes="(max-width: 768px) 100vw, 800px"
+              priority
+            />
+          ) : (
+            <span className="text-8xl opacity-30" aria-hidden="true">🏡</span>
+          )}
         </div>
 
-        {/* Content */}
         <div className="prose prose-lg max-w-none">
           {showFullContent ? (
             <div className="text-brand-gray leading-relaxed">
@@ -117,9 +154,7 @@ export default function ListingDetailPage({ params }) {
                 <p className="text-sm text-brand-gray mb-4">
                   Book a free consultation to discuss this listing and get personalized advice.
                 </p>
-                <Link href="/booking" className="btn-primary">
-                  Book Consultation
-                </Link>
+                <Link href="/booking" className="btn-primary">Book Consultation</Link>
               </div>
             </div>
           ) : (
@@ -134,12 +169,8 @@ export default function ListingDetailPage({ params }) {
                   to access all premium listings, the discussion board, and more.
                 </p>
                 <div className="flex gap-4 justify-center">
-                  <Link href="/pricing" className="btn-primary">
-                    Subscribe Now
-                  </Link>
-                  <Link href="/login" className="btn-secondary">
-                    Sign In
-                  </Link>
+                  <Link href="/pricing" className="btn-primary">Subscribe Now</Link>
+                  <Link href="/login" className="btn-secondary">Sign In</Link>
                 </div>
               </div>
             </>

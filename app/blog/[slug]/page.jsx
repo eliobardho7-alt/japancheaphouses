@@ -1,7 +1,9 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import { Calendar, Clock, ArrowLeft, Lock, ExternalLink } from 'lucide-react';
 import { getPostBySlug, blogPosts } from '@/data/blogs';
+import { absoluteUrl, blogPostingJsonLd, breadcrumbList } from '@/lib/jsonld';
 
 export async function generateStaticParams() {
   return blogPosts.map((post) => ({ slug: post.slug }));
@@ -11,28 +13,57 @@ export async function generateMetadata({ params }) {
   const post = getPostBySlug(params.slug);
   if (!post) return {};
 
+  const url = `/blog/${post.slug}`;
+  const image = post.coverImage || '/og-image.jpg';
+
   return {
-    title: `${post.title} | Yama Vista`,
+    title: post.title,
     description: post.excerpt,
+    alternates: { canonical: url },
+    openGraph: {
+      type: 'article',
+      title: post.title,
+      description: post.excerpt,
+      url,
+      publishedTime: post.date,
+      authors: [post.author || 'Elio Bardho'],
+      tags: post.tags || [],
+      images: [{ url: image, alt: post.title }],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: post.title,
+      description: post.excerpt,
+      images: [image],
+    },
   };
 }
 
 export default function BlogPostPage({ params }) {
   const post = getPostBySlug(params.slug);
-
-  if (!post) {
-    notFound();
-  }
+  if (!post) notFound();
 
   // TODO: Check user subscription status server-side
-  // For now, premium posts show paywall preview
-  const isSubscribed = false; // Would come from auth/subscription check
+  const isSubscribed = false;
   const showFullContent = !post.isPremium || isSubscribed;
+
+  const jsonLd = [
+    blogPostingJsonLd(post),
+    breadcrumbList([
+      { name: 'Home', path: '/' },
+      { name: 'Blog', path: '/blog' },
+      { name: post.title, path: `/blog/${post.slug}` },
+    ]),
+  ];
 
   return (
     <article className="pt-24">
+      <script
+        type="application/ld+json"
+        // eslint-disable-next-line react/no-danger
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <div className="container-custom max-w-4xl py-12">
-        {/* Back link */}
         <Link
           href="/blog"
           className="inline-flex items-center text-sm text-brand-gray hover:text-brand-accent transition-base mb-8"
@@ -41,7 +72,6 @@ export default function BlogPostPage({ params }) {
           Back to all posts
         </Link>
 
-        {/* Header */}
         <header className="mb-8">
           <span className="text-xs text-brand-accent uppercase tracking-wider">
             {post.category}
@@ -74,12 +104,23 @@ export default function BlogPostPage({ params }) {
           </div>
         </header>
 
-        {/* Featured Image Placeholder */}
-        <div className="relative aspect-video bg-gradient-to-br from-gray-200 to-gray-300 mb-12 flex items-center justify-center">
-          <span className="text-8xl opacity-30">🏡</span>
+        {/* Featured Image — use real image when available; otherwise show
+            a gradient placeholder (still keep an aria-hidden emoji decoration). */}
+        <div className="relative aspect-video bg-gradient-to-br from-gray-200 to-gray-300 mb-12 flex items-center justify-center overflow-hidden">
+          {post.coverImage ? (
+            <Image
+              src={post.coverImage}
+              alt={post.title}
+              fill
+              className="object-cover"
+              sizes="(max-width: 768px) 100vw, 800px"
+              priority
+            />
+          ) : (
+            <span className="text-8xl opacity-30" aria-hidden="true">🏡</span>
+          )}
         </div>
 
-        {/* Content */}
         <div className="prose prose-lg max-w-none">
           {showFullContent ? (
             <div className="text-brand-gray leading-relaxed whitespace-pre-line">
@@ -116,39 +157,26 @@ export default function BlogPostPage({ params }) {
             </div>
           ) : (
             <>
-              {/* Preview (first paragraph) */}
-              <p className="text-brand-gray leading-relaxed mb-6">
-                {post.excerpt}
-              </p>
+              <p className="text-brand-gray leading-relaxed mb-6">{post.excerpt}</p>
 
-              {/* Paywall */}
               <div className="bg-brand-light border-2 border-brand-border p-8 my-8 text-center">
                 <Lock className="h-12 w-12 text-brand-accent mx-auto mb-4" />
-                <h3 className="font-serif text-2xl text-brand mb-3">
-                  Premium Content
-                </h3>
+                <h3 className="font-serif text-2xl text-brand mb-3">Premium Content</h3>
                 <p className="text-brand-gray mb-6 max-w-md mx-auto">
-                  This listing is exclusive to our subscribers. Join our community for $5/month
-                  to access all premium listings, the discussion board, and more.
+                  This article is exclusive to our subscribers. Join our community for $5/month
+                  to access all premium content.
                 </p>
                 <div className="flex gap-4 justify-center">
-                  <Link href="/pricing" className="btn-primary">
-                    Subscribe Now
-                  </Link>
-                  <Link href="/login" className="btn-secondary">
-                    Sign In
-                  </Link>
+                  <Link href="/pricing" className="btn-primary">Subscribe Now</Link>
+                  <Link href="/login" className="btn-secondary">Sign In</Link>
                 </div>
               </div>
             </>
           )}
 
-          {/* Source link */}
           {post.linkedinUrl && showFullContent && (
             <div className="mt-12 p-4 bg-brand-light flex items-center justify-between">
-              <span className="text-sm text-brand-gray">
-                Originally posted on LinkedIn
-              </span>
+              <span className="text-sm text-brand-gray">Originally posted on LinkedIn</span>
               <a
                 href={post.linkedinUrl}
                 target="_blank"
@@ -162,21 +190,16 @@ export default function BlogPostPage({ params }) {
           )}
         </div>
 
-        {/* Tags */}
         {showFullContent && post.tags && (
           <div className="mt-8 flex flex-wrap gap-2">
             {post.tags.map((tag) => (
-              <span
-                key={tag}
-                className="text-xs px-3 py-1 bg-brand-light text-brand-gray"
-              >
+              <span key={tag} className="text-xs px-3 py-1 bg-brand-light text-brand-gray">
                 #{tag}
               </span>
             ))}
           </div>
         )}
 
-        {/* Related posts */}
         <section className="mt-16 pt-12 border-t border-brand-border">
           <h2 className="font-serif text-2xl text-brand mb-6">More from Yama Vista</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -184,13 +207,19 @@ export default function BlogPostPage({ params }) {
               .filter((p) => p.slug !== post.slug)
               .slice(0, 2)
               .map((related) => (
-                <Link
-                  key={related.id}
-                  href={`/blog/${related.slug}`}
-                  className="block group"
-                >
-                  <div className="aspect-video bg-gradient-to-br from-gray-200 to-gray-300 mb-4 flex items-center justify-center">
-                    <span className="text-4xl opacity-30">🏡</span>
+                <Link key={related.id} href={`/blog/${related.slug}`} className="block group">
+                  <div className="relative aspect-video bg-gradient-to-br from-gray-200 to-gray-300 mb-4 flex items-center justify-center overflow-hidden">
+                    {related.coverImage ? (
+                      <Image
+                        src={related.coverImage}
+                        alt={related.title}
+                        fill
+                        className="object-cover"
+                        sizes="(max-width: 768px) 100vw, 400px"
+                      />
+                    ) : (
+                      <span className="text-4xl opacity-30" aria-hidden="true">🏡</span>
+                    )}
                   </div>
                   <span className="text-xs text-brand-accent uppercase tracking-wider">
                     {related.category}
