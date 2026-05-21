@@ -2,6 +2,7 @@ import { Playfair_Display, Plus_Jakarta_Sans } from 'next/font/google';
 import './globals.css';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
+import { getSiteUrl } from '@/lib/site-url';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 
 const playfair = Playfair_Display({
@@ -16,8 +17,7 @@ const jakarta = Plus_Jakarta_Sans({
   display: 'swap',
 });
 
-const SITE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL || 'https://japancheaphouses.vercel.app';
+const SITE_URL = getSiteUrl();
 
 export const metadata = {
   metadataBase: new URL(SITE_URL),

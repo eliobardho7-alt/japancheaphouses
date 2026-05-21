@@ -1,8 +1,8 @@
 import { blogPosts } from '@/data/blogs';
 import { listings } from '@/data/listings';
+import { getSiteUrl } from '@/lib/site-url';
 
-const SITE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL || 'https://japancheaphouses.vercel.app';
+const SITE_URL = getSiteUrl();
 
 export default function sitemap() {
   const now = new Date();
