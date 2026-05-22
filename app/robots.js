@@ -1,4 +1,6 @@
-const SITE_URL = 'https://www.japancheaphouses.com';
+import { getSiteUrl } from '@/lib/site-url';
+
+const SITE_URL = getSiteUrl();
 
 export default function robots() {
   return {
@@ -6,7 +8,7 @@ export default function robots() {
       {
         userAgent: '*',
         allow: '/',
-        disallow: ['/admin/', '/api/', '/login', '/signup'],
+        disallow: ['/admin', '/admin/', '/api/', '/login', '/signup'],
       },
     ],
     sitemap: `${SITE_URL}/sitemap.xml`,

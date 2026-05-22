@@ -1,13 +1,9 @@
 export const metadata = {
-  title: 'Community — Japan Real Estate Investors Forum',
+  title: 'Community — Members-only Japan real estate discussions',
   description:
-    'Join the Japan Cheap Houses community. Discuss real estate, share experiences, and connect with fellow investors in Japan. Members-only forum.',
+    'Private member space for Yama Vista subscribers to discuss Japan real estate strategy, share leads, and ask questions of the community.',
   alternates: { canonical: '/community' },
-  openGraph: {
-    title: 'Community — Japan Cheap Houses',
-    description: 'A members-only forum for Japan real estate investors.',
-    url: '/community',
-  },
+  robots: { index: false, follow: false }, // gated content — don't index
 };
 
 export default function CommunityLayout({ children }) {

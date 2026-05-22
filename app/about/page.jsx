@@ -1,8 +1,13 @@
-'use client';
-
 import Link from 'next/link';
 import Image from 'next/image';
 import { CheckCircle, Users, Target, Heart } from 'lucide-react';
+
+export const metadata = {
+  title: 'About — A boutique consultancy for Japan real estate',
+  description:
+    "Meet Elio Bardho, founder of Yama Vista. Three years on the ground in Japan helping international buyers navigate akiya purchases, renovations, and property management.",
+  alternates: { canonical: '/about' },
+};
 
 export default function AboutPage() {
   return (
@@ -15,7 +20,7 @@ export default function AboutPage() {
               About Yama Vista
             </h1>
             <p className="text-lg text-brand-gray leading-relaxed">
-              We're on a mission to make Japanese real estate investment accessible, transparent, and profitable for international investors. Since our founding, we've helped hundreds of people find their perfect property in Japan.
+              We help international buyers navigate Japan&apos;s real estate market — from akiya hunting and inspections to renovations and ongoing property management.
             </p>
           </div>
         </div>
@@ -28,23 +33,23 @@ export default function AboutPage() {
             <div>
               <h2 className="font-serif text-4xl text-brand mb-6">Our Story</h2>
               <p className="text-brand-gray mb-4 leading-relaxed">
-                Hey, my name is Elio. I've been living in Japan for about three years, and I've worked with different companies in marketing and also the real estate industry, assisting people with buying and managing homes in Japan and also renovating them.
+                Hey, my name is Elio. I&apos;ve been living in Japan for about three years, and I&apos;ve worked with different companies in marketing and the real estate industry, assisting people with buying, managing, and renovating homes in Japan.
               </p>
               <p className="text-brand-gray mb-4 leading-relaxed">
-                I personally own three properties in Japan, and I created Yama Vista in order to help those who live abroad and would like to purchase their dream home in Japan. I assist with renovations and answer any questions they may have throughout the entire process.
+                I personally own three properties in Japan, and I created Yama Vista to help those who live abroad and would like to purchase their dream home here. I assist with renovations and answer any questions throughout the entire process.
               </p>
               <p className="text-brand-gray mb-4 leading-relaxed">
-                There's a lot of different nuances in Japan's real estate market that people may not know about—things you need to account for that can make or break a deal. That's where we come in.
+                There are a lot of nuances in Japan&apos;s real estate market that outside buyers don&apos;t see — things that can make or break a deal. That&apos;s where we come in.
               </p>
               <p className="text-brand-gray leading-relaxed">
-                I highly recommend booking a free consultation, and we can help you get your dream home in Japan.
+                I highly recommend booking a free consultation, and we can help you find your dream home in Japan.
               </p>
             </div>
             <div className="flex justify-center">
               <div className="w-64 h-64 rounded-full overflow-hidden border-4 border-brand shadow-lg">
                 <Image
                   src="/elio-profile.jpg"
-                  alt="Elio Bardho, Founder"
+                  alt="Elio Bardho, Founder of Yama Vista"
                   width={256}
                   height={256}
                   className="w-full h-full object-cover"
@@ -86,7 +91,7 @@ export default function AboutPage() {
                 icon: CheckCircle,
                 title: 'Excellence',
                 description:
-                  'We sweat the details so you don\'t have to. Quality in everything.',
+                  "We sweat the details so you don't have to. Quality in everything.",
               },
             ].map((value, idx) => (
               <div key={idx} className="text-center">
@@ -101,15 +106,15 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* Stats */}
+      {/* Stats — replaced inflated numbers with claims that match the bio.
+          Update these as the business grows; don't pad them. */}
       <section className="section-padding bg-brand-light">
         <div className="container-custom">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 text-center">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
             {[
-              { number: '100+', label: 'Properties Listed' },
-              { number: '500+', label: 'Active Members' },
-              { number: '15+', label: 'Years Experience' },
-              { number: '¥5B+', label: 'Total Value Invested' },
+              { number: '3+', label: 'Years On The Ground In Japan' },
+              { number: '3', label: 'Properties Personally Owned' },
+              { number: 'JP', label: 'Local Network & Partners' },
             ].map((stat, idx) => (
               <div key={idx}>
                 <div className="font-serif text-4xl md:text-5xl text-brand mb-2">
@@ -133,7 +138,7 @@ export default function AboutPage() {
               {
                 name: 'Elio Bardho',
                 role: 'Founder & Lead Consultant',
-                bio: 'Real estate investor with 15+ years in the Japanese market. Specializes in akiya and high-yield properties.',
+                bio: 'Three years living in Japan, working across marketing and real estate. Owns and manages three Japanese properties personally.',
               },
               {
                 name: 'Local Partners',

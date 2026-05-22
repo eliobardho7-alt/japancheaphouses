@@ -1,13 +1,8 @@
 export const metadata = {
-  title: 'Contact — Japan Real Estate Consulting',
+  title: 'Contact Yama Vista',
   description:
-    'Get in touch with Japan Cheap Houses for expert real estate consulting, property inquiries, and investment advice in Japan.',
+    'Send us a message about Japan real estate, akiya investment, property management, or membership. We respond within one business day.',
   alternates: { canonical: '/contact' },
-  openGraph: {
-    title: 'Contact — Japan Cheap Houses',
-    description: 'Reach out for Japan real estate consulting.',
-    url: '/contact',
-  },
 };
 
 export default function ContactLayout({ children }) {

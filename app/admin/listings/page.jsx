@@ -4,83 +4,76 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Plus, Edit2, Trash2, ArrowLeft, Save, X, Lock, Eye } from 'lucide-react';
-import { supabase, getCurrentUser } from '@/lib/supabase';
-import { listings as initialListings } from '@/data/listings';
 
-const ADMIN_EMAIL = 'eliobardho7@gmail.com';
+const emptyListing = () => ({
+  title: '',
+  slug: '',
+  location: '',
+  price: '',
+  priceUSD: '',
+  propertyType: 'Detached House',
+  landIncluded: true,
+  excerpt: '',
+  content: '',
+  isPremium: true,
+  date: new Date().toISOString().split('T')[0],
+  tags: [],
+});
 
 export default function AdminListingsPage() {
   const router = useRouter();
-  const [user, setUser] = useState(null);
-  const [listings, setListings] = useState(initialListings);
+  const [listings, setListings] = useState([]);
   const [editing, setEditing] = useState(null);
   const [isCreating, setIsCreating] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
-  useEffect(() => {
-    checkAuth();
-  }, []);
-
-  const checkAuth = async () => {
-    const currentUser = await getCurrentUser();
-    if (!currentUser || currentUser.email !== ADMIN_EMAIL) {
+  const load = async () => {
+    const res = await fetch('/api/admin/listings', { cache: 'no-store' });
+    if (res.status === 401 || res.status === 403) {
       router.push('/login');
       return;
     }
-    setUser(currentUser);
-
-    if (supabase) {
-      const { data } = await supabase.from('listings').select('*').order('date', { ascending: false });
-      if (data && data.length > 0) setListings(data);
-    }
-    setLoading(false);
+    const data = await res.json();
+    setListings(data.listings || []);
   };
 
-  const emptyListing = {
-    title: '',
-    slug: '',
-    location: '',
-    price: '',
-    priceUSD: '',
-    propertyType: 'Detached House',
-    landIncluded: true,
-    excerpt: '',
-    content: '',
-    isPremium: true,
-    date: new Date().toISOString().split('T')[0],
-    tags: [],
-  };
+  useEffect(() => {
+    (async () => {
+      try {
+        await load();
+      } finally {
+        setLoading(false);
+      }
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleSave = async (listing) => {
-    const slug =
-      listing.slug || listing.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
-    const listingToSave = { ...listing, slug };
-
-    if (supabase) {
-      if (isCreating) {
-        await supabase.from('listings').insert(listingToSave);
-      } else {
-        await supabase.from('listings').update(listingToSave).eq('id', listing.id);
-      }
-      const { data } = await supabase.from('listings').select('*').order('date', { ascending: false });
-      if (data) setListings(data);
-    } else {
-      if (isCreating) {
-        setListings([{ ...listingToSave, id: Date.now() }, ...listings]);
-      } else {
-        setListings(listings.map((l) => (l.id === listing.id ? listingToSave : l)));
-      }
-      alert('Note: Without Supabase, changes are not saved permanently. Set up Supabase in README.md.');
+    setError('');
+    const method = isCreating ? 'POST' : 'PUT';
+    const res = await fetch('/api/admin/listings', {
+      method,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(listing),
+    });
+    if (!res.ok) {
+      const { error: msg } = await res.json().catch(() => ({}));
+      setError(msg || 'Failed to save');
+      return;
     }
-
+    await load();
     setEditing(null);
     setIsCreating(false);
   };
 
   const handleDelete = async (id) => {
     if (!confirm('Are you sure you want to delete this listing?')) return;
-    if (supabase) {
-      await supabase.from('listings').delete().eq('id', id);
+    const res = await fetch(`/api/admin/listings?id=${encodeURIComponent(id)}`, { method: 'DELETE' });
+    if (!res.ok) {
+      const { error: msg } = await res.json().catch(() => ({}));
+      setError(msg || 'Failed to delete');
+      return;
     }
     setListings(listings.filter((l) => l.id !== id));
   };
@@ -96,12 +89,13 @@ export default function AdminListingsPage() {
   if (editing || isCreating) {
     return (
       <ListingEditor
-        listing={editing || emptyListing}
+        listing={editing || emptyListing()}
         onSave={handleSave}
         onCancel={() => {
           setEditing(null);
           setIsCreating(false);
         }}
+        error={error}
       />
     );
   }
@@ -109,29 +103,21 @@ export default function AdminListingsPage() {
   return (
     <div className="pt-24 min-h-screen bg-brand-light">
       <div className="container-custom py-12">
-        <Link
-          href="/admin"
-          className="inline-flex items-center text-sm text-brand-gray hover:text-brand-accent mb-6"
-        >
+        <Link href="/admin" className="inline-flex items-center text-sm text-brand-gray hover:text-brand-accent mb-6">
           <ArrowLeft className="h-4 w-4 mr-1" />
           Back to Dashboard
         </Link>
 
         <div className="flex items-center justify-between mb-8">
           <h1 className="font-serif text-4xl text-brand">Manage Listings</h1>
-          <button
-            onClick={() => setIsCreating(true)}
-            className="btn-primary flex items-center gap-2"
-          >
+          <button onClick={() => setIsCreating(true)} className="btn-primary flex items-center gap-2">
             <Plus className="h-4 w-4" />
             New Listing
           </button>
         </div>
 
-        {!supabase && (
-          <div className="bg-yellow-50 border border-yellow-200 p-4 mb-6 text-sm text-yellow-800">
-            ⚠️ Supabase is not configured yet. Changes won't be saved permanently. See README.md for setup instructions.
-          </div>
+        {error && (
+          <div className="bg-red-50 border border-red-200 text-red-700 text-sm p-3 mb-6">{error}</div>
         )}
 
         <div className="bg-white border border-brand-border">
@@ -163,23 +149,13 @@ export default function AdminListingsPage() {
                     </td>
                     <td className="p-4 text-right">
                       <div className="flex justify-end gap-2">
-                        <Link
-                          href={`/listings/${listing.slug}`}
-                          target="_blank"
-                          className="text-brand-gray hover:text-brand-accent"
-                        >
+                        <Link href={`/listings/${listing.slug}`} target="_blank" className="text-brand-gray hover:text-brand-accent">
                           <Eye className="h-4 w-4" />
                         </Link>
-                        <button
-                          onClick={() => setEditing(listing)}
-                          className="text-brand-gray hover:text-brand-accent"
-                        >
+                        <button onClick={() => setEditing(listing)} className="text-brand-gray hover:text-brand-accent">
                           <Edit2 className="h-4 w-4" />
                         </button>
-                        <button
-                          onClick={() => handleDelete(listing.id)}
-                          className="text-brand-gray hover:text-red-600"
-                        >
+                        <button onClick={() => handleDelete(listing.id)} className="text-brand-gray hover:text-red-600">
                           <Trash2 className="h-4 w-4" />
                         </button>
                       </div>
@@ -195,23 +171,22 @@ export default function AdminListingsPage() {
   );
 }
 
-function ListingEditor({ listing, onSave, onCancel }) {
+function ListingEditor({ listing, onSave, onCancel, error }) {
   const [form, setForm] = useState(listing);
 
   return (
     <div className="pt-24 min-h-screen bg-brand-light">
       <div className="container-custom py-12 max-w-4xl">
-        <button
-          onClick={onCancel}
-          className="inline-flex items-center text-sm text-brand-gray hover:text-brand-accent mb-6"
-        >
+        <button onClick={onCancel} className="inline-flex items-center text-sm text-brand-gray hover:text-brand-accent mb-6">
           <ArrowLeft className="h-4 w-4 mr-1" />
           Back
         </button>
 
-        <h1 className="font-serif text-3xl text-brand mb-8">
-          {listing.id ? 'Edit Listing' : 'New Listing'}
-        </h1>
+        <h1 className="font-serif text-3xl text-brand mb-8">{listing.id ? 'Edit Listing' : 'New Listing'}</h1>
+
+        {error && (
+          <div className="bg-red-50 border border-red-200 text-red-700 text-sm p-3 mb-4">{error}</div>
+        )}
 
         <div className="bg-white border border-brand-border p-8 space-y-5">
           <div>

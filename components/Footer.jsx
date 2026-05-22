@@ -3,7 +3,9 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { useState } from 'react';
-import { Mail, Instagram, Linkedin, Twitter } from 'lucide-react';
+import { Mail, Linkedin } from 'lucide-react';
+
+const CURRENT_YEAR = new Date().getFullYear();
 
 export default function Footer() {
   const [email, setEmail] = useState('');
@@ -89,6 +91,9 @@ export default function Footer() {
               </li>
             </ul>
 
+            {/* Only show real, working social profiles. Removed Instagram/Twitter
+                placeholders that pointed to "#" — empty hrefs hurt SEO and
+                signal a broken site. Add them back here once you have real URLs. */}
             <div className="flex space-x-4 mt-6">
               <a
                 href="https://www.linkedin.com/in/elio-bardho-2273a0231"
@@ -98,20 +103,6 @@ export default function Footer() {
                 aria-label="LinkedIn"
               >
                 <Linkedin className="h-5 w-5" />
-              </a>
-              <a
-                href="#"
-                className="text-brand-gray hover:text-brand-accent transition-base"
-                aria-label="Instagram"
-              >
-                <Instagram className="h-5 w-5" />
-              </a>
-              <a
-                href="#"
-                className="text-brand-gray hover:text-brand-accent transition-base"
-                aria-label="Twitter"
-              >
-                <Twitter className="h-5 w-5" />
               </a>
             </div>
           </div>
@@ -123,6 +114,15 @@ export default function Footer() {
               Get the latest listings and Japan real estate insights.
             </p>
             <form onSubmit={handleSubscribe} className="flex flex-col gap-2">
+              {/* Honeypot field — invisible to humans, bots fill it */}
+              <input
+                type="text"
+                name="website"
+                tabIndex={-1}
+                autoComplete="off"
+                className="hidden"
+                aria-hidden="true"
+              />
               <input
                 type="email"
                 required
@@ -151,7 +151,7 @@ export default function Footer() {
         {/* Bottom Bar */}
         <div className="mt-12 pt-8 border-t border-brand-border flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-xs text-brand-gray">
-            © {new Date().getFullYear()} Yama Vista Real Estate Consulting. All rights reserved.
+            © {CURRENT_YEAR} Yama Vista Real Estate Consulting. All rights reserved.
           </p>
           <div className="flex space-x-6">
             <Link

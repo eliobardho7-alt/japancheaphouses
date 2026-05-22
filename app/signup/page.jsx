@@ -6,6 +6,8 @@ import { useRouter } from 'next/navigation';
 import { Mail, Lock, User, ArrowRight } from 'lucide-react';
 import { signUp } from '@/lib/supabase';
 
+const MIN_PASSWORD_LENGTH = 10;
+
 export default function SignupPage() {
   const router = useRouter();
   const [formData, setFormData] = useState({
@@ -26,8 +28,20 @@ export default function SignupPage() {
       return;
     }
 
-    if (formData.password.length < 6) {
-      setError('Password must be at least 6 characters');
+    if (formData.password.length < MIN_PASSWORD_LENGTH) {
+      setError(`Password must be at least ${MIN_PASSWORD_LENGTH} characters`);
+      return;
+    }
+
+    // Encourage some character variety. Not foolproof — Supabase Auth should
+    // also have a min-length policy set on the dashboard.
+    const variety =
+      /[a-z]/.test(formData.password) +
+      /[A-Z]/.test(formData.password) +
+      /[0-9]/.test(formData.password) +
+      /[^A-Za-z0-9]/.test(formData.password);
+    if (variety < 2) {
+      setError('Password must include at least two of: lowercase, uppercase, numbers, symbols.');
       return;
     }
 
@@ -49,16 +63,12 @@ export default function SignupPage() {
         <div className="max-w-md mx-auto bg-white border border-brand-border p-8 md:p-12">
           <div className="text-center mb-8">
             <h1 className="font-serif text-3xl text-brand mb-2">Create an Account</h1>
-            <p className="text-sm text-brand-gray">
-              Join Yama Vista and start exploring properties.
-            </p>
+            <p className="text-sm text-brand-gray">Join Yama Vista and start exploring properties.</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-5">
             {error && (
-              <div className="bg-red-50 border border-red-200 text-red-700 text-sm p-3">
-                {error}
-              </div>
+              <div className="bg-red-50 border border-red-200 text-red-700 text-sm p-3">{error}</div>
             )}
 
             <div>
@@ -69,9 +79,7 @@ export default function SignupPage() {
                   type="text"
                   required
                   value={formData.fullName}
-                  onChange={(e) =>
-                    setFormData({ ...formData, fullName: e.target.value })
-                  }
+                  onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
                   className="w-full pl-10 pr-3 py-2 border border-brand-border text-sm focus:border-brand outline-none"
                   placeholder="John Doe"
                 />
@@ -100,12 +108,11 @@ export default function SignupPage() {
                 <input
                   type="password"
                   required
+                  minLength={MIN_PASSWORD_LENGTH}
                   value={formData.password}
-                  onChange={(e) =>
-                    setFormData({ ...formData, password: e.target.value })
-                  }
+                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                   className="w-full pl-10 pr-3 py-2 border border-brand-border text-sm focus:border-brand outline-none"
-                  placeholder="At least 6 characters"
+                  placeholder={`At least ${MIN_PASSWORD_LENGTH} characters`}
                 />
               </div>
             </div>
@@ -117,10 +124,9 @@ export default function SignupPage() {
                 <input
                   type="password"
                   required
+                  minLength={MIN_PASSWORD_LENGTH}
                   value={formData.confirmPassword}
-                  onChange={(e) =>
-                    setFormData({ ...formData, confirmPassword: e.target.value })
-                  }
+                  onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
                   className="w-full pl-10 pr-3 py-2 border border-brand-border text-sm focus:border-brand outline-none"
                   placeholder="Confirm your password"
                 />
@@ -138,22 +144,15 @@ export default function SignupPage() {
 
             <p className="text-xs text-brand-gray text-center">
               By signing up, you agree to our{' '}
-              <Link href="/terms" className="underline">
-                Terms
-              </Link>{' '}
+              <Link href="/terms" className="underline">Terms</Link>{' '}
               and{' '}
-              <Link href="/privacy" className="underline">
-                Privacy Policy
-              </Link>
-              .
+              <Link href="/privacy" className="underline">Privacy Policy</Link>.
             </p>
           </form>
 
           <p className="text-sm text-brand-gray text-center mt-6">
             Already have an account?{' '}
-            <Link href="/login" className="text-brand-accent hover:underline">
-              Sign in
-            </Link>
+            <Link href="/login" className="text-brand-accent hover:underline">Sign in</Link>
           </p>
         </div>
       </div>

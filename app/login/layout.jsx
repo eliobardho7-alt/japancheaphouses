@@ -1,5 +1,8 @@
 export const metadata = {
-  robots: { index: false, follow: true },
+  title: 'Sign In',
+  description: 'Sign in to your Yama Vista account.',
+  alternates: { canonical: '/login' },
+  robots: { index: false, follow: false },
 };
 
 export default function LoginLayout({ children }) {

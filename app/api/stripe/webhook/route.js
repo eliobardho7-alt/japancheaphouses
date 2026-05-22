@@ -2,9 +2,9 @@ import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { createClient } from '@supabase/supabase-js';
 
-// Webhook handler for Stripe subscription events
-// Configure webhook URL in Stripe Dashboard: https://yourdomain.com/api/stripe/webhook
-// Required events: customer.subscription.created, customer.subscription.updated, customer.subscription.deleted
+// Stripe webhook for subscription lifecycle.
+// Configure in Stripe Dashboard with: checkout.session.completed,
+// customer.subscription.updated, customer.subscription.deleted.
 
 export async function POST(request) {
   if (!process.env.STRIPE_SECRET_KEY || !process.env.STRIPE_WEBHOOK_SECRET) {
@@ -16,7 +16,6 @@ export async function POST(request) {
   const signature = request.headers.get('stripe-signature');
 
   let event;
-
   try {
     event = stripe.webhooks.constructEvent(
       body,
@@ -28,38 +27,46 @@ export async function POST(request) {
     return NextResponse.json({ error: 'Invalid signature' }, { status: 400 });
   }
 
-  // Connect to Supabase (if configured)
-  const supabase = process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY
-    ? createClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL,
-        process.env.SUPABASE_SERVICE_ROLE_KEY
-      )
-    : null;
+  const supabase =
+    process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY
+      ? createClient(
+          process.env.NEXT_PUBLIC_SUPABASE_URL,
+          process.env.SUPABASE_SERVICE_ROLE_KEY,
+          { auth: { persistSession: false, autoRefreshToken: false } }
+        )
+      : null;
 
   try {
     switch (event.type) {
       case 'checkout.session.completed': {
         const session = event.data.object;
+        // user_id is now set server-side at checkout creation, so we can trust it.
+        const userId = session.metadata?.userId || session.client_reference_id;
 
-        if (supabase) {
-          await supabase.from('subscriptions').upsert({
-            user_id: session.metadata?.userId,
-            stripe_customer_id: session.customer,
-            stripe_subscription_id: session.subscription,
-            status: 'active',
-            email: session.customer_email,
-            created_at: new Date().toISOString(),
-          });
+        if (!userId) {
+          console.error('checkout.session.completed without userId — refusing to upsert');
+          break;
         }
 
-        console.log('New subscription:', session.customer_email);
+        if (supabase) {
+          await supabase.from('subscriptions').upsert(
+            {
+              user_id: userId,
+              stripe_customer_id: session.customer,
+              stripe_subscription_id: session.subscription,
+              status: 'active',
+              email: session.customer_email,
+              created_at: new Date().toISOString(),
+            },
+            { onConflict: 'user_id' }
+          );
+        }
         break;
       }
 
       case 'customer.subscription.updated':
       case 'customer.subscription.deleted': {
         const subscription = event.data.object;
-
         if (supabase) {
           await supabase
             .from('subscriptions')
@@ -73,7 +80,8 @@ export async function POST(request) {
       }
 
       default:
-        console.log(`Unhandled event type: ${event.type}`);
+        // Unhandled events are normal; ignore.
+        break;
     }
 
     return NextResponse.json({ received: true });

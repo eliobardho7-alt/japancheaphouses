@@ -1,13 +1,8 @@
 export const metadata = {
-  title: 'Pricing — Japan Cheap Houses Membership',
+  title: 'Plans & Pricing — Community membership at $5/month',
   description:
-    'Join the Japan Cheap Houses community for $5/month. Access premium listings, exclusive guides, and connect with fellow investors.',
+    'Free access to public listings and articles, or join the Community membership for $5/month to unlock premium listings, direct messaging, and member discussions.',
   alternates: { canonical: '/pricing' },
-  openGraph: {
-    title: 'Pricing — Japan Cheap Houses',
-    description: 'Affordable membership for serious Japan property investors.',
-    url: '/pricing',
-  },
 };
 
 export default function PricingLayout({ children }) {

@@ -1,13 +1,8 @@
 export const metadata = {
-  title: 'Property Listings — Affordable Akiya & Houses in Japan',
+  title: 'Japan Property Listings — Akiya & Investment Homes',
   description:
-    'Browse curated listings of affordable Japanese houses, akiya, and rare properties. From rural farmhouses to beachside villas, find your next investment in Japan.',
+    'Curated property listings across Japan: akiya, detached houses, beachside villas, and city investment homes. Free entries plus premium listings for subscribers.',
   alternates: { canonical: '/listings' },
-  openGraph: {
-    title: 'Property Listings — Japan Cheap Houses',
-    description: 'Curated affordable property listings across Japan.',
-    url: '/listings',
-  },
 };
 
 export default function ListingsLayout({ children }) {

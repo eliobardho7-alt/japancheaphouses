@@ -1,71 +1,59 @@
 import { blogPosts } from '@/data/blogs';
 import { listings } from '@/data/listings';
+import { getSiteUrl } from '@/lib/site-url';
 import { createClient } from '@supabase/supabase-js';
 
-const SITE_URL = 'https://www.japancheaphouses.com';
+const SITE_URL = getSiteUrl();
 
 export default async function sitemap() {
+  const now = new Date();
+
   const staticRoutes = [
-    { path: '', priority: 1.0, changeFrequency: 'daily' },
-    { path: '/about', priority: 0.8, changeFrequency: 'monthly' },
-    { path: '/services', priority: 0.9, changeFrequency: 'monthly' },
-    { path: '/listings', priority: 0.9, changeFrequency: 'daily' },
-    { path: '/map', priority: 0.9, changeFrequency: 'daily' },
-    { path: '/blog', priority: 0.9, changeFrequency: 'daily' },
-    { path: '/pricing', priority: 0.8, changeFrequency: 'monthly' },
-    { path: '/community', priority: 0.7, changeFrequency: 'daily' },
-    { path: '/contact', priority: 0.6, changeFrequency: 'monthly' },
-    { path: '/booking', priority: 0.7, changeFrequency: 'monthly' },
+    { path: '/', changeFrequency: 'weekly', priority: 1.0 },
+    { path: '/about', changeFrequency: 'monthly', priority: 0.7 },
+    { path: '/services', changeFrequency: 'monthly', priority: 0.8 },
+    { path: '/listings', changeFrequency: 'weekly', priority: 0.9 },
+    { path: '/map', changeFrequency: 'daily', priority: 0.9 },
+    { path: '/blog', changeFrequency: 'weekly', priority: 0.9 },
+    { path: '/pricing', changeFrequency: 'monthly', priority: 0.7 },
+    { path: '/contact', changeFrequency: 'yearly', priority: 0.6 },
+    { path: '/booking', changeFrequency: 'monthly', priority: 0.8 },
+    { path: '/community', changeFrequency: 'weekly', priority: 0.6 },
+    { path: '/privacy', changeFrequency: 'yearly', priority: 0.3 },
+    { path: '/terms', changeFrequency: 'yearly', priority: 0.3 },
   ].map((r) => ({
     url: `${SITE_URL}${r.path}`,
-    lastModified: new Date(),
+    lastModified: now,
     changeFrequency: r.changeFrequency,
     priority: r.priority,
   }));
 
-  // Static blog posts (fallback)
+  // Static manual blog posts (data/blogs.js fallback)
   const staticBlogRoutes = blogPosts.map((post) => ({
     url: `${SITE_URL}/blog/${post.slug}`,
-    lastModified: new Date(post.date),
+    lastModified: post.date ? new Date(post.date) : now,
     changeFrequency: 'monthly',
     priority: 0.7,
   }));
 
-  // Dynamic blog posts, topics, and scraped listings from Supabase
+  // Static manual listings (data/listings.js)
+  const staticListingRoutes = listings.map((listing) => ({
+    url: `${SITE_URL}/listings/${listing.slug}`,
+    lastModified: listing.date ? new Date(listing.date) : now,
+    changeFrequency: 'weekly',
+    priority: 0.8,
+  }));
+
+  // Dynamic scraped listings (Supabase) — adds /map/listing/[id] and /blog/property/[id]
+  // routes per active listing. Big SEO win: ~130+ extra indexable pages.
+  let scrapedRoutes = [];
   let dbBlogRoutes = [];
-  let topicRoutes = [];
-  let scrapedListingRoutes = [];
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-  if (url && key) {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  if (supabaseUrl && supabaseKey) {
     try {
-      const db = createClient(url, key);
-      const { data: blogs } = await db.from('blog_posts').select('slug, date');
-      if (blogs) {
-        dbBlogRoutes = blogs.map((post) => ({
-          url: `${SITE_URL}/blog/${post.slug}`,
-          lastModified: new Date(post.date || Date.now()),
-          changeFrequency: 'monthly',
-          priority: 0.7,
-        }));
-      }
+      const db = createClient(supabaseUrl, supabaseKey);
 
-      const { data: topics } = await db
-        .from('topics')
-        .select('id, last_activity')
-        .order('last_activity', { ascending: false })
-        .limit(200);
-      if (topics) {
-        topicRoutes = topics.map((t) => ({
-          url: `${SITE_URL}/community/topic/${t.id}`,
-          lastModified: new Date(t.last_activity || Date.now()),
-          changeFrequency: 'weekly',
-          priority: 0.5,
-        }));
-      }
-
-      // Scraped property listings — each gets BOTH a detail page and a blog post.
-      // High priority: these are the site's primary long-tail SEO surface.
       const { data: scraped } = await db
         .from('scraped_listings')
         .select('id, updated_at, blog_content, blog_published_at')
@@ -73,15 +61,14 @@ export default async function sitemap() {
         .limit(5000);
       if (scraped) {
         scraped.forEach((l) => {
-          scrapedListingRoutes.push({
+          scrapedRoutes.push({
             url: `${SITE_URL}/map/listing/${l.id}`,
             lastModified: new Date(l.updated_at || Date.now()),
             changeFrequency: 'weekly',
             priority: 0.8,
           });
-          // Only include the blog post if it's been generated
           if (l.blog_content) {
-            scrapedListingRoutes.push({
+            scrapedRoutes.push({
               url: `${SITE_URL}/blog/property/${l.id}`,
               lastModified: new Date(l.blog_published_at || l.updated_at || Date.now()),
               changeFrequency: 'monthly',
@@ -90,26 +77,31 @@ export default async function sitemap() {
           }
         });
       }
+
+      // DB-managed manual blog posts (blog_posts table)
+      const { data: dbBlogs } = await db
+        .from('blog_posts')
+        .select('slug, date')
+        .limit(500);
+      if (dbBlogs) {
+        dbBlogRoutes = dbBlogs.map((post) => ({
+          url: `${SITE_URL}/blog/${post.slug}`,
+          lastModified: post.date ? new Date(post.date) : now,
+          changeFrequency: 'monthly',
+          priority: 0.7,
+        }));
+      }
     } catch (e) {
-      // ignore — fall back to static content
+      // Fail silently — keep static routes
     }
   }
 
-  // Listings
-  const listingRoutes = listings.map((listing) => ({
-    url: `${SITE_URL}/listings/${listing.slug}`,
-    lastModified: new Date(),
-    changeFrequency: 'weekly',
-    priority: 0.8,
-  }));
-
-  const blogUrlSet = new Set(dbBlogRoutes.map((r) => r.url));
-  return [
-    ...staticRoutes,
+  // Dedup blogs (DB entries override static ones)
+  const dbBlogUrls = new Set(dbBlogRoutes.map((r) => r.url));
+  const mergedBlogs = [
     ...dbBlogRoutes,
-    ...staticBlogRoutes.filter((r) => !blogUrlSet.has(r.url)),
-    ...listingRoutes,
-    ...scrapedListingRoutes,
-    ...topicRoutes,
+    ...staticBlogRoutes.filter((r) => !dbBlogUrls.has(r.url)),
   ];
+
+  return [...staticRoutes, ...mergedBlogs, ...staticListingRoutes, ...scrapedRoutes];
 }

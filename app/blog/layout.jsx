@@ -1,14 +1,8 @@
 export const metadata = {
-  title: 'Blog — Japan Real Estate Insights, Akiya Guides & Market Analysis',
+  title: 'Blog — Japan real estate guides and market analysis',
   description:
-    'Expert guides, market analysis, and insider tips on Japanese real estate. Learn about akiya investing, regulations, ROI, and finding affordable property in Japan.',
+    'Guides, market analysis, and on-the-ground insight on Japanese real estate, akiya investment, regulations, and property management.',
   alternates: { canonical: '/blog' },
-  openGraph: {
-    title: 'Blog — Japan Cheap Houses',
-    description: 'Guides and market insights on Japan real estate.',
-    url: '/blog',
-    type: 'website',
-  },
 };
 
 export default function BlogLayout({ children }) {

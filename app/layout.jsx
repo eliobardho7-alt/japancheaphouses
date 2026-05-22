@@ -2,6 +2,7 @@ import { Playfair_Display, Plus_Jakarta_Sans } from 'next/font/google';
 import './globals.css';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
+import { getSiteUrl } from '@/lib/site-url';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 import Script from 'next/script';
 
@@ -17,8 +18,7 @@ const jakarta = Plus_Jakarta_Sans({
   display: 'swap',
 });
 
-const SITE_URL = 'https://www.japancheaphouses.com';
-const SITE_NAME = 'Japan Cheap Houses';
+const SITE_URL = getSiteUrl();
 
 export const metadata = {
   metadataBase: new URL(SITE_URL),
@@ -45,14 +45,12 @@ export const metadata = {
   authors: [{ name: 'Elio Bardho' }],
   creator: 'Elio Bardho',
   publisher: 'Japan Cheap Houses',
-  alternates: {
-    canonical: '/',
-  },
+  alternates: { canonical: '/' },
   openGraph: {
     type: 'website',
     locale: 'en_US',
     url: SITE_URL,
-    siteName: SITE_NAME,
+    siteName: 'Japan Cheap Houses',
     title: 'Japan Cheap Houses | Affordable Akiya & Real Estate in Japan',
     description:
       'Find affordable Japanese homes and akiya. Expert consulting for international investors.',
@@ -85,24 +83,22 @@ export const metadata = {
   },
   icons: {
     icon: '/logo.png',
+    shortcut: '/logo.png',
     apple: '/logo.png',
   },
   category: 'Real Estate',
 };
 
-const organizationSchema = {
+const organizationJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'Organization',
-  name: SITE_NAME,
+  name: 'Japan Cheap Houses',
   alternateName: 'Yama Vista',
   url: SITE_URL,
   logo: `${SITE_URL}/logo.png`,
   description:
     'Affordable Japanese real estate and akiya consulting for international investors.',
-  founder: {
-    '@type': 'Person',
-    name: 'Elio Bardho',
-  },
+  founder: { '@type': 'Person', name: 'Elio Bardho' },
   contactPoint: {
     '@type': 'ContactPoint',
     email: 'eliobardho7@gmail.com',
@@ -110,15 +106,13 @@ const organizationSchema = {
     areaServed: 'Worldwide',
     availableLanguage: ['English', 'Japanese'],
   },
-  sameAs: [
-    'https://www.linkedin.com/in/elio-bardho-2273a0231',
-  ],
+  sameAs: ['https://www.linkedin.com/in/elio-bardho-2273a0231'],
 };
 
-const websiteSchema = {
+const websiteJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'WebSite',
-  name: SITE_NAME,
+  name: 'Japan Cheap Houses',
   url: SITE_URL,
   potentialAction: {
     '@type': 'SearchAction',
@@ -131,22 +125,20 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en" className={`${playfair.variable} ${jakarta.variable}`}>
       <body className="min-h-screen flex flex-col">
-        <Script
-          id="schema-organization"
-          type="application/ld+json"
-          strategy="beforeInteractive"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
-        />
-        <Script
-          id="schema-website"
-          type="application/ld+json"
-          strategy="beforeInteractive"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }}
-        />
         <Navbar />
         <main className="flex-grow">{children}</main>
         <Footer />
         <SpeedInsights />
+        <script
+          type="application/ld+json"
+          // eslint-disable-next-line react/no-danger
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
+        />
+        <script
+          type="application/ld+json"
+          // eslint-disable-next-line react/no-danger
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }}
+        />
         <Script
           src="https://www.googletagmanager.com/gtag/js?id=G-E30KB03XNZ"
           strategy="afterInteractive"

@@ -1,13 +1,8 @@
 export const metadata = {
-  title: 'Book a Consultation — Japan Real Estate Expert',
+  title: 'Book a Free Consultation',
   description:
-    'Book a 1-on-1 consultation with Elio Bardho to discuss your Japan real estate goals — akiya purchases, property management, or investment strategy.',
+    'Schedule a free 45-minute consultation with Yama Vista to discuss your Japan real estate goals, akiya plans, or property management needs.',
   alternates: { canonical: '/booking' },
-  openGraph: {
-    title: 'Book a Consultation — Japan Cheap Houses',
-    description: 'Schedule expert consulting for Japan property investment.',
-    url: '/booking',
-  },
 };
 
 export default function BookingLayout({ children }) {
