@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { MapPin, ArrowLeft, Lock, Home, Calendar } from 'lucide-react';
 import { listings, getListingBySlug } from '@/data/listings';
+import ViewGate from '@/components/ViewGate';
 
 export async function generateStaticParams() {
   return listings.map((listing) => ({ slug: listing.slug }));
@@ -12,8 +13,20 @@ export async function generateMetadata({ params }) {
   if (!listing) return {};
 
   return {
-    title: `${listing.title} | Yama Vista`,
+    title: listing.title,
     description: listing.excerpt,
+    alternates: { canonical: `/listings/${listing.slug}` },
+    openGraph: {
+      title: listing.title,
+      description: listing.excerpt,
+      url: `/listings/${listing.slug}`,
+      type: 'article',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: listing.title,
+      description: listing.excerpt,
+    },
   };
 }
 
@@ -24,12 +37,48 @@ export default function ListingDetailPage({ params }) {
     notFound();
   }
 
-  // TODO: Check user subscription status server-side
   const isSubscribed = false;
   const showFullContent = !listing.isPremium || isSubscribed;
 
+  const breadcrumbSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://www.japancheaphouses.com' },
+      { '@type': 'ListItem', position: 2, name: 'Listings', item: 'https://www.japancheaphouses.com/listings' },
+      { '@type': 'ListItem', position: 3, name: listing.title, item: `https://www.japancheaphouses.com/listings/${listing.slug}` },
+    ],
+  };
+
+  const listingSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'Product',
+    name: listing.title,
+    description: listing.excerpt,
+    category: 'Real Estate',
+    brand: { '@type': 'Brand', name: 'Japan Cheap Houses' },
+    offers: listing.price
+      ? {
+          '@type': 'Offer',
+          price: String(listing.price).replace(/[^0-9.]/g, '') || undefined,
+          priceCurrency: 'JPY',
+          availability: 'https://schema.org/InStock',
+          url: `https://www.japancheaphouses.com/listings/${listing.slug}`,
+        }
+      : undefined,
+  };
+
   return (
+    <ViewGate listingId={`static-${listing.id}`}>
     <article className="pt-24">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(listingSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
+      />
       <div className="container-custom max-w-4xl py-12">
         {/* Back link */}
         <Link
@@ -147,5 +196,6 @@ export default function ListingDetailPage({ params }) {
         </div>
       </div>
     </article>
+    </ViewGate>
   );
 }

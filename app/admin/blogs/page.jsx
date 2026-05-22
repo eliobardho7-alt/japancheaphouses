@@ -9,6 +9,37 @@ import { blogPosts as initialBlogs } from '@/data/blogs';
 
 const ADMIN_EMAIL = 'eliobardho7@gmail.com';
 
+const toDb = (post) => ({
+  title: post.title,
+  slug: post.slug,
+  category: post.category,
+  date: post.date,
+  read_time: post.readTime,
+  author: post.author,
+  excerpt: post.excerpt,
+  content: post.content,
+  is_premium: post.isPremium,
+  tags: post.tags || [],
+  linkedin_url: post.linkedinUrl || '',
+  cover_image: post.coverImage || '',
+});
+
+const fromDb = (row) => ({
+  id: row.id,
+  slug: row.slug,
+  title: row.title,
+  category: row.category,
+  date: row.date,
+  readTime: row.read_time,
+  author: row.author,
+  excerpt: row.excerpt,
+  content: row.content,
+  isPremium: row.is_premium,
+  tags: row.tags || [],
+  linkedinUrl: row.linkedin_url || '',
+  coverImage: row.cover_image || '',
+});
+
 export default function AdminBlogsPage() {
   const router = useRouter();
   const [user, setUser] = useState(null);
@@ -29,13 +60,12 @@ export default function AdminBlogsPage() {
     }
     setUser(currentUser);
 
-    // Load from Supabase if configured
     if (supabase) {
       const { data } = await supabase
         .from('blog_posts')
         .select('*')
         .order('date', { ascending: false });
-      if (data && data.length > 0) setPosts(data);
+      if (data && data.length > 0) setPosts(data.map(fromDb));
     }
     setLoading(false);
   };
@@ -60,17 +90,16 @@ export default function AdminBlogsPage() {
 
     if (supabase) {
       if (isCreating) {
-        await supabase.from('blog_posts').insert(postToSave);
+        await supabase.from('blog_posts').insert(toDb(postToSave));
       } else {
-        await supabase.from('blog_posts').update(postToSave).eq('id', post.id);
+        await supabase.from('blog_posts').update(toDb(postToSave)).eq('id', post.id);
       }
 
-      // Reload
       const { data } = await supabase
         .from('blog_posts')
         .select('*')
         .order('date', { ascending: false });
-      if (data) setPosts(data);
+      if (data) setPosts(data.map(fromDb));
     } else {
       // No Supabase: just update local state
       if (isCreating) {

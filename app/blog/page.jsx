@@ -1,17 +1,46 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Lock, Calendar, Clock, Heart } from 'lucide-react';
-import { blogPosts, categories } from '@/data/blogs';
+import { blogPosts as staticPosts, categories } from '@/data/blogs';
+import { supabase } from '@/lib/supabase';
 
 export default function BlogPage() {
   const [activeCategory, setActiveCategory] = useState('All Posts');
+  const [allPosts, setAllPosts] = useState(staticPosts);
+
+  useEffect(() => {
+    if (!supabase) return;
+    supabase
+      .from('blog_posts')
+      .select('*')
+      .order('date', { ascending: false })
+      .then(({ data }) => {
+        if (data && data.length > 0) {
+          setAllPosts(data.map((row) => ({
+            id: row.id,
+            slug: row.slug,
+            title: row.title,
+            category: row.category,
+            date: row.date,
+            readTime: row.read_time,
+            author: row.author,
+            excerpt: row.excerpt,
+            content: row.content,
+            isPremium: row.is_premium,
+            tags: row.tags || [],
+            linkedinUrl: row.linkedin_url || '',
+            coverImage: row.cover_image || '',
+          })));
+        }
+      });
+  }, []);
 
   const filteredPosts =
     activeCategory === 'All Posts'
-      ? blogPosts
-      : blogPosts.filter((post) => post.category === activeCategory);
+      ? allPosts
+      : allPosts.filter((post) => post.category === activeCategory);
 
   return (
     <div className="pt-24">

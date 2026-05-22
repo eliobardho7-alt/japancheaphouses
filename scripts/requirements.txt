@@ -1,0 +1,4 @@
+# Japan Real Estate Listing Pipeline — pinned dependencies (April 2026)
+anthropic==0.92.0
+httpx==0.28.1
+beautifulsoup4==4.13.5

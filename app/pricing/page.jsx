@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Check, X } from 'lucide-react';
+import { Check, X, Sparkles, Clock, TrendingDown } from 'lucide-react';
 
 export default function PricingPage() {
   const handleSubscribe = async () => {
@@ -9,16 +9,13 @@ export default function PricingPage() {
       const response = await fetch('/api/stripe/create-checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email: '', // TODO: Get from logged-in user (Supabase auth)
-          userId: '',
-        }),
+        body: JSON.stringify({ email: '', userId: '' }),
       });
 
       const data = await response.json();
 
       if (data.error) {
-        alert('Stripe is not set up yet. Please follow the setup guide in README.md');
+        alert(data.error);
         return;
       }
 
@@ -31,54 +28,11 @@ export default function PricingPage() {
     }
   };
 
-  const plans = [
-    {
-      name: 'Free',
-      price: '0',
-      period: 'forever',
-      description: 'Get started with basic access',
-      features: [
-        { text: 'Browse free listings', included: true },
-        { text: 'Read public blog posts', included: true },
-        { text: 'Free initial consultation', included: true },
-        { text: 'Newsletter access', included: true },
-        { text: 'Premium listings', included: false },
-        { text: 'Community discussion access', included: false },
-        { text: 'Direct messaging', included: false },
-        { text: 'Priority support', included: false },
-      ],
-      cta: 'Get Started',
-      ctaHref: '/signup',
-      featured: false,
-    },
-    {
-      name: 'Community',
-      price: '5',
-      period: 'per month',
-      description: 'Full access to listings and community',
-      features: [
-        { text: 'Browse free listings', included: true },
-        { text: 'Read public blog posts', included: true },
-        { text: 'Free initial consultation', included: true },
-        { text: 'Newsletter access', included: true },
-        { text: 'Premium listings (all)', included: true },
-        { text: 'Community discussion access', included: true },
-        { text: 'Direct messaging', included: true },
-        { text: 'Priority support', included: true },
-      ],
-      cta: 'Subscribe Now',
-      ctaHref: null,
-      featured: true,
-      action: handleSubscribe,
-    },
-  ];
-
   return (
     <div className="pt-24">
       <section className="section-padding bg-white">
         <div className="container-custom">
-          {/* Header */}
-          <div className="text-center mb-16">
+          <div className="text-center mb-12">
             <h1 className="font-serif text-5xl md:text-6xl text-brand mb-4">
               Plans & Pricing
             </h1>
@@ -87,136 +41,186 @@ export default function PricingPage() {
             </p>
           </div>
 
+          {/* Founders' Offer Banner */}
+          <div className="max-w-4xl mx-auto mb-16 bg-brand-accent text-white p-6 md:p-8 text-center">
+            <div className="inline-flex items-center gap-2 bg-white text-brand-accent text-xs font-bold uppercase tracking-wider px-3 py-1 mb-3">
+              <Sparkles className="h-3 w-3" />
+              Founders' Offer — Limited Time
+            </div>
+            <h2 className="font-serif text-2xl md:text-3xl mb-2">
+              First 2 months FREE → then just $1/month for 10 months
+            </h2>
+            <p className="text-white/90 text-sm md:text-base">
+              Lock in this price for your first year. Cancel anytime.
+            </p>
+          </div>
+
           {/* Plans */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-            {plans.map((plan) => (
-              <div
-                key={plan.name}
-                className={`relative p-8 border-2 ${
-                  plan.featured
-                    ? 'border-brand-accent bg-brand text-white'
-                    : 'border-brand-border bg-white'
-                }`}
-              >
-                {plan.featured && (
-                  <span className="absolute top-0 right-0 -translate-y-1/2 bg-brand-accent text-white text-xs px-3 py-1">
-                    MOST POPULAR
-                  </span>
-                )}
+            {/* Free plan */}
+            <div className="border-2 border-brand-border bg-white p-8">
+              <h3 className="font-serif text-2xl text-brand mb-1">Free</h3>
+              <p className="text-sm text-brand-gray mb-6">For browsers and the curious</p>
 
-                <h2
-                  className={`font-serif text-3xl mb-2 ${
-                    plan.featured ? 'text-white' : 'text-brand'
-                  }`}
-                >
-                  {plan.name}
-                </h2>
-                <p
-                  className={`text-sm mb-6 ${
-                    plan.featured ? 'text-white/80' : 'text-brand-gray'
-                  }`}
-                >
-                  {plan.description}
-                </p>
-
-                <div className="mb-6">
-                  <span
-                    className={`text-5xl font-serif ${
-                      plan.featured ? 'text-white' : 'text-brand'
-                    }`}
-                  >
-                    ${plan.price}
-                  </span>
-                  <span
-                    className={`text-sm ml-2 ${
-                      plan.featured ? 'text-white/80' : 'text-brand-gray'
-                    }`}
-                  >
-                    {plan.period}
-                  </span>
-                </div>
-
-                <ul className="space-y-3 mb-8">
-                  {plan.features.map((feature, idx) => (
-                    <li key={idx} className="flex items-start text-sm">
-                      {feature.included ? (
-                        <Check
-                          className={`h-5 w-5 mr-3 mt-0.5 flex-shrink-0 ${
-                            plan.featured ? 'text-white' : 'text-brand-accent'
-                          }`}
-                        />
-                      ) : (
-                        <X
-                          className={`h-5 w-5 mr-3 mt-0.5 flex-shrink-0 ${
-                            plan.featured ? 'text-white/40' : 'text-gray-300'
-                          }`}
-                        />
-                      )}
-                      <span
-                        className={
-                          plan.featured
-                            ? feature.included
-                              ? 'text-white'
-                              : 'text-white/40'
-                            : feature.included
-                            ? 'text-brand-gray'
-                            : 'text-gray-400'
-                        }
-                      >
-                        {feature.text}
-                      </span>
-                    </li>
-                  ))}
-                </ul>
-
-                {plan.action ? (
-                  <button onClick={plan.action} className="btn-primary bg-white text-brand hover:bg-brand-light w-full">
-                    {plan.cta}
-                  </button>
-                ) : (
-                  <Link
-                    href={plan.ctaHref}
-                    className={`block text-center w-full px-6 py-3 text-sm font-medium tracking-wide transition-base ${
-                      plan.featured
-                        ? 'bg-white text-brand hover:bg-brand-light'
-                        : 'bg-brand text-white hover:bg-opacity-90'
-                    }`}
-                  >
-                    {plan.cta}
-                  </Link>
-                )}
+              <div className="mb-6">
+                <span className="font-serif text-5xl text-brand">$0</span>
+                <span className="text-brand-gray text-sm ml-2">forever</span>
               </div>
-            ))}
+
+              <ul className="space-y-3 mb-8 text-sm">
+                {[
+                  { text: 'See every listing on the map', included: true },
+                  { text: 'Browse free blog posts', included: true },
+                  { text: 'Free initial consultation', included: true },
+                  { text: 'Newsletter access', included: true },
+                  { text: '5 listing views per day', included: 'limited' },
+                  { text: 'See listing prices', included: false },
+                  { text: 'Full property descriptions & photos', included: false },
+                  { text: 'Premium listings', included: false },
+                  { text: 'Community forum', included: false },
+                  { text: 'Direct messaging & priority support', included: false },
+                ].map((f, idx) => (
+                  <li key={idx} className="flex items-start gap-2">
+                    {f.included === true && <Check className="h-4 w-4 text-green-600 shrink-0 mt-0.5" />}
+                    {f.included === false && <X className="h-4 w-4 text-brand-gray shrink-0 mt-0.5 opacity-40" />}
+                    {f.included === 'limited' && <Check className="h-4 w-4 text-brand-accent shrink-0 mt-0.5" />}
+                    <span className={f.included === false ? 'text-brand-gray opacity-60' : 'text-brand'}>
+                      {f.text}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+
+              <Link
+                href="/signup"
+                className="block text-center w-full border border-brand text-brand py-3 text-sm font-medium hover:bg-brand hover:text-white transition-base"
+              >
+                Get Started
+              </Link>
+            </div>
+
+            {/* Community plan — featured */}
+            <div className="border-2 border-brand-accent bg-brand text-white p-8 relative overflow-hidden">
+              <div className="absolute top-4 right-4">
+                <div className="bg-brand-accent text-white text-xs font-bold uppercase tracking-wider px-3 py-1">
+                  Best Value
+                </div>
+              </div>
+
+              <h3 className="font-serif text-2xl mb-1">Community</h3>
+              <p className="text-sm text-white/70 mb-6">Full access to everything</p>
+
+              {/* Pricing breakdown */}
+              <div className="mb-6 space-y-2">
+                <div className="flex items-baseline gap-2">
+                  <span className="font-serif text-5xl">$0</span>
+                  <span className="text-white/70 text-sm">/ month — first 2 months</span>
+                </div>
+                <div className="text-sm text-white/80 flex items-center gap-2">
+                  <TrendingDown className="h-3 w-3" />
+                  <span>then <strong className="text-white">$1/mo</strong> for the next 10 months</span>
+                </div>
+                <div className="text-xs text-white/60 flex items-center gap-2">
+                  <Clock className="h-3 w-3" />
+                  <span>then $5/mo standard rate</span>
+                </div>
+                <div className="mt-3 inline-block bg-white/10 text-xs px-3 py-1">
+                  Total for year 1: only <strong>$10</strong>
+                </div>
+              </div>
+
+              <ul className="space-y-3 mb-8 text-sm">
+                {[
+                  'Unlimited daily listing views',
+                  'See every listing price',
+                  'Full property descriptions & photos',
+                  'Premium-only listings',
+                  'Community discussion forum',
+                  'Direct messaging with members',
+                  'Free 30-min consultation per quarter',
+                  'Priority email support',
+                  'Cancel anytime — no commitment',
+                ].map((f, idx) => (
+                  <li key={idx} className="flex items-start gap-2">
+                    <Check className="h-4 w-4 shrink-0 mt-0.5" />
+                    <span>{f}</span>
+                  </li>
+                ))}
+              </ul>
+
+              <button
+                onClick={handleSubscribe}
+                className="block w-full bg-white text-brand py-3 text-sm font-medium hover:bg-brand-light transition-base"
+              >
+                Start Free — 2 Months on Us
+              </button>
+              <p className="text-xs text-white/60 text-center mt-3">
+                No payment until day 60. Cancel during trial = no charge.
+              </p>
+            </div>
+          </div>
+
+          {/* Founders' Offer breakdown */}
+          <div className="max-w-3xl mx-auto mt-16 bg-brand-light p-8">
+            <h3 className="font-serif text-2xl text-brand mb-4 text-center">
+              How the founders' offer works
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-center text-sm">
+              <div>
+                <div className="font-serif text-3xl text-brand-accent mb-2">$0</div>
+                <p className="font-medium text-brand mb-1">Month 1 – 2</p>
+                <p className="text-brand-gray text-xs">
+                  Try everything completely free. No payment required up front.
+                </p>
+              </div>
+              <div>
+                <div className="font-serif text-3xl text-brand-accent mb-2">$1</div>
+                <p className="font-medium text-brand mb-1">Month 3 – 12</p>
+                <p className="text-brand-gray text-xs">
+                  Reduced rate for the rest of your first year. Auto-billed monthly.
+                </p>
+              </div>
+              <div>
+                <div className="font-serif text-3xl text-brand-accent mb-2">$5</div>
+                <p className="font-medium text-brand mb-1">Month 13+</p>
+                <p className="text-brand-gray text-xs">
+                  Standard rate kicks in. Cancel anytime through Stripe billing portal.
+                </p>
+              </div>
+            </div>
           </div>
 
           {/* FAQ */}
-          <div className="max-w-3xl mx-auto mt-24">
-            <h2 className="font-serif text-3xl text-brand text-center mb-12">
-              Frequently Asked Questions
-            </h2>
-            <div className="space-y-6">
+          <div className="max-w-2xl mx-auto mt-16">
+            <h3 className="font-serif text-2xl text-brand mb-6 text-center">
+              Questions
+            </h3>
+            <div className="space-y-4 text-sm">
               {[
                 {
+                  q: 'Will I be charged during the 2-month free trial?',
+                  a: 'No. You only enter a payment method to reserve your spot. Cancel before day 60 and you pay nothing.',
+                },
+                {
+                  q: 'What happens after the first year?',
+                  a: 'On month 13, the price changes to $5/month. You can cancel any time before that with no obligation.',
+                },
+                {
                   q: 'Can I cancel anytime?',
-                  a: 'Yes, you can cancel your subscription at any time. You will continue to have access until the end of your billing period.',
+                  a: 'Yes. Stripe handles all billing — you can cancel one-click from your account portal at any time.',
                 },
                 {
-                  q: 'What payment methods do you accept?',
-                  a: 'We accept all major credit cards (Visa, Mastercard, American Express) through Stripe, our secure payment processor.',
+                  q: 'What happens to my access if I cancel?',
+                  a: 'You keep access until the end of your billing period. After that, you drop back to the free tier (3 listing views per day, no prices, no premium content).',
                 },
-                {
-                  q: 'Are the listings exclusive?',
-                  a: 'Yes, our premium listings are sourced through our network of local Japanese contacts and not available on mainstream platforms.',
-                },
-                {
-                  q: 'Do I get a refund if I cancel?',
-                  a: 'We do not offer refunds, but you can cancel anytime to prevent future charges.',
-                },
-              ].map((faq, idx) => (
-                <div key={idx} className="border-b border-brand-border pb-6">
-                  <h3 className="font-serif text-lg text-brand mb-2">{faq.q}</h3>
-                  <p className="text-sm text-brand-gray">{faq.a}</p>
-                </div>
+              ].map((item, idx) => (
+                <details key={idx} className="border border-brand-border p-4 group">
+                  <summary className="font-medium text-brand cursor-pointer flex justify-between items-center">
+                    {item.q}
+                    <span className="text-brand-accent group-open:rotate-45 transition-transform text-lg">+</span>
+                  </summary>
+                  <p className="text-brand-gray mt-3">{item.a}</p>
+                </details>
               ))}
             </div>
           </div>

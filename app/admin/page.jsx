@@ -146,6 +146,18 @@ export default function AdminDashboard() {
           </Link>
 
           <Link
+            href="/admin/map-listings"
+            className="bg-white border border-brand-border p-6 card-hover block"
+          >
+            <Home className="h-8 w-8 text-brand-accent mb-3" />
+            <h3 className="font-serif text-lg text-brand mb-2">Map Listings</h3>
+            <p className="text-sm text-brand-gray mb-3">
+              Manage pins on the /map page. Geocodes addresses automatically.
+            </p>
+            <span className="text-sm text-brand-accent">Open →</span>
+          </Link>
+
+          <Link
             href="/admin/bookings"
             className="bg-white border border-brand-border p-6 card-hover block"
           >

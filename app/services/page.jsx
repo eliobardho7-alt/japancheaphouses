@@ -4,9 +4,15 @@ import { Check } from 'lucide-react';
 import { services } from '@/data/services';
 
 export const metadata = {
-  title: 'Services | Yama Vista',
+  title: 'Services — Japan Property Inspection, Management & Consulting',
   description:
-    'Our services include pre-purchase home inspection, property management, and free initial consultations for Japan real estate.',
+    'Pre-purchase home inspection, property management, and free initial consultations for Japan real estate. Expert services for international investors buying akiya and houses in Japan.',
+  alternates: { canonical: '/services' },
+  openGraph: {
+    title: 'Services — Japan Cheap Houses',
+    description: 'Inspection, management, and consulting for Japan real estate.',
+    url: '/services',
+  },
 };
 
 export default function ServicesPage() {

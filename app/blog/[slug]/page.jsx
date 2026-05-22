@@ -2,35 +2,123 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { Calendar, Clock, ArrowLeft, Lock, ExternalLink } from 'lucide-react';
 import { getPostBySlug, blogPosts } from '@/data/blogs';
+import { createClient } from '@supabase/supabase-js';
+import ViewCounter from '@/components/ViewCounter';
 
-export async function generateStaticParams() {
-  return blogPosts.map((post) => ({ slug: post.slug }));
+export const dynamic = 'force-dynamic';
+
+async function getPost(slug) {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  if (url && key) {
+    const db = createClient(url, key);
+    const { data } = await db.from('blog_posts').select('*').eq('slug', slug).single();
+    if (data) {
+      return {
+        id: data.id,
+        slug: data.slug,
+        title: data.title,
+        category: data.category,
+        date: data.date,
+        readTime: data.read_time,
+        author: data.author,
+        excerpt: data.excerpt,
+        content: data.content,
+        isPremium: data.is_premium,
+        tags: data.tags || [],
+        linkedinUrl: data.linkedin_url || '',
+        coverImage: data.cover_image || '',
+        viewCount: data.view_count || 0,
+        isDbPost: true,
+      };
+    }
+  }
+  return getPostBySlug(slug);
 }
 
 export async function generateMetadata({ params }) {
-  const post = getPostBySlug(params.slug);
+  const post = await getPost(params.slug);
   if (!post) return {};
 
   return {
-    title: `${post.title} | Yama Vista`,
+    title: post.title,
     description: post.excerpt,
+    alternates: { canonical: `/blog/${post.slug}` },
+    openGraph: {
+      title: post.title,
+      description: post.excerpt,
+      url: `/blog/${post.slug}`,
+      type: 'article',
+      publishedTime: post.date,
+      authors: [post.author],
+      tags: post.tags,
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: post.title,
+      description: post.excerpt,
+    },
+    keywords: post.tags,
   };
 }
 
-export default function BlogPostPage({ params }) {
-  const post = getPostBySlug(params.slug);
+export default async function BlogPostPage({ params }) {
+  const post = await getPost(params.slug);
 
   if (!post) {
     notFound();
   }
 
-  // TODO: Check user subscription status server-side
-  // For now, premium posts show paywall preview
-  const isSubscribed = false; // Would come from auth/subscription check
+  const isSubscribed = false;
   const showFullContent = !post.isPremium || isSubscribed;
+
+  const breadcrumbSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://www.japancheaphouses.com' },
+      { '@type': 'ListItem', position: 2, name: 'Blog', item: 'https://www.japancheaphouses.com/blog' },
+      { '@type': 'ListItem', position: 3, name: post.title, item: `https://www.japancheaphouses.com/blog/${post.slug}` },
+    ],
+  };
+
+  const articleSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'Article',
+    headline: post.title,
+    description: post.excerpt,
+    datePublished: post.date,
+    dateModified: post.date,
+    author: {
+      '@type': 'Person',
+      name: post.author,
+    },
+    publisher: {
+      '@type': 'Organization',
+      name: 'Japan Cheap Houses',
+      logo: {
+        '@type': 'ImageObject',
+        url: 'https://www.japancheaphouses.com/logo.png',
+      },
+    },
+    mainEntityOfPage: {
+      '@type': 'WebPage',
+      '@id': `https://www.japancheaphouses.com/blog/${post.slug}`,
+    },
+    keywords: (post.tags || []).join(', '),
+    articleSection: post.category,
+  };
 
   return (
     <article className="pt-24">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
+      />
       <div className="container-custom max-w-4xl py-12">
         {/* Back link */}
         <Link
@@ -71,6 +159,12 @@ export default function BlogPostPage({ params }) {
               <Clock className="h-3 w-3" />
               {post.readTime}
             </span>
+            {post.isDbPost && (
+              <>
+                <span>•</span>
+                <ViewCounter type="blog" recordId={post.id} initialCount={post.viewCount} />
+              </>
+            )}
           </div>
         </header>
 

@@ -1,64 +1,52 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Lock, MessageCircle, Users, TrendingUp } from 'lucide-react';
+import { Lock, MessageCircle, Users, TrendingUp, Plus, X, Send } from 'lucide-react';
 import { communityCategories } from '@/data/community';
+import { supabase, getCurrentUser, getUserSubscription } from '@/lib/supabase';
 
-// Mock recent topics (in production, this comes from Supabase)
-const mockTopics = [
-  {
-    id: 1,
-    category: 'newcomers',
-    title: 'Just moved to Tokyo - where should I start looking for property?',
-    author: 'Sarah K.',
-    replies: 12,
-    lastActivity: '2 hours ago',
-  },
-  {
-    id: 2,
-    category: 'repairs',
-    title: 'Best contractors in Kanagawa for renovation work?',
-    author: 'Mike R.',
-    replies: 8,
-    lastActivity: '5 hours ago',
-  },
-  {
-    id: 3,
-    category: 'investments',
-    title: 'ROI calculations for Akiya in remote areas - my experience',
-    author: 'David L.',
-    replies: 24,
-    lastActivity: '1 day ago',
-  },
-  {
-    id: 4,
-    category: 'potential-purchases',
-    title: 'Looking at this property in Wakayama - thoughts?',
-    author: 'Anna P.',
-    replies: 6,
-    lastActivity: '3 hours ago',
-  },
-];
+const ADMIN_EMAIL = 'eliobardho7@gmail.com';
 
 export default function CommunityPage() {
-  // TODO: Check user auth and subscription status
-  const isAuthenticated = false;
-  const isSubscribed = false;
+  const [user, setUser] = useState(null);
+  const [isSubscribed, setIsSubscribed] = useState(false);
+  const [loading, setLoading] = useState(true);
 
-  if (!isAuthenticated || !isSubscribed) {
-    return <CommunityGate />;
+  useEffect(() => {
+    async function checkAuth() {
+      const currentUser = await getCurrentUser();
+      setUser(currentUser);
+      if (currentUser) {
+        if (currentUser.email === ADMIN_EMAIL) {
+          setIsSubscribed(true);
+        } else {
+          const sub = await getUserSubscription(currentUser.id);
+          setIsSubscribed(!!sub);
+        }
+      }
+      setLoading(false);
+    }
+    checkAuth();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="pt-24 min-h-screen flex items-center justify-center">
+        <p className="text-brand-gray">Loading...</p>
+      </div>
+    );
   }
 
-  return <CommunityDashboard />;
+  if (!user || !isSubscribed) return <CommunityGate user={user} />;
+  return <CommunityDashboard user={user} />;
 }
 
-function CommunityGate() {
+function CommunityGate({ user }) {
   return (
     <div className="pt-24">
       <section className="section-padding bg-white">
         <div className="container-custom max-w-5xl">
-          {/* Header */}
           <div className="text-center mb-16">
             <Lock className="h-12 w-12 text-brand-accent mx-auto mb-4" />
             <h1 className="font-serif text-4xl md:text-5xl text-brand mb-4">
@@ -72,23 +60,26 @@ function CommunityGate() {
               <Link href="/pricing" className="btn-primary">
                 Subscribe Now
               </Link>
-              <Link href="/login" className="btn-secondary">
-                Already a Member? Sign In
-              </Link>
+              {!user && (
+                <Link href="/login" className="btn-secondary">
+                  Already a Member? Sign In
+                </Link>
+              )}
+              {user && (
+                <Link href="/pricing" className="btn-secondary">
+                  Upgrade to Access
+                </Link>
+              )}
             </div>
           </div>
 
-          {/* Preview of Categories */}
           <div className="mb-16">
             <h2 className="font-serif text-2xl text-brand text-center mb-8">
               Discussion Categories
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {communityCategories.map((cat) => (
-                <div
-                  key={cat.id}
-                  className={`${cat.color} border p-6 relative overflow-hidden`}
-                >
+                <div key={cat.id} className={`${cat.color} border p-6`}>
                   <div className="text-3xl mb-2">{cat.icon}</div>
                   <h3 className="font-serif text-lg text-brand mb-2">{cat.name}</h3>
                   <p className="text-sm text-brand-gray">{cat.description}</p>
@@ -97,7 +88,6 @@ function CommunityGate() {
             </div>
           </div>
 
-          {/* Benefits */}
           <div className="bg-brand-light p-12">
             <h2 className="font-serif text-2xl text-brand text-center mb-8">
               What You Get as a Member
@@ -107,20 +97,17 @@ function CommunityGate() {
                 {
                   icon: Users,
                   title: 'Active Community',
-                  description:
-                    'Chat with hundreds of fellow investors and property owners.',
+                  description: 'Chat with fellow investors and property owners.',
                 },
                 {
                   icon: MessageCircle,
-                  title: 'Direct Messaging',
-                  description:
-                    'Connect privately with members to discuss deals and share insights.',
+                  title: 'Discussion Threads',
+                  description: 'Post questions, share experiences, get answers.',
                 },
                 {
                   icon: TrendingUp,
                   title: 'Premium Listings',
-                  description:
-                    'Access exclusive property listings before anyone else.',
+                  description: 'Access exclusive property listings before anyone else.',
                 },
               ].map((item, idx) => (
                 <div key={idx} className="text-center">
@@ -137,13 +124,64 @@ function CommunityGate() {
   );
 }
 
-function CommunityDashboard() {
+function CommunityDashboard({ user }) {
   const [activeCategory, setActiveCategory] = useState('all');
+  const [topics, setTopics] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [showNewTopic, setShowNewTopic] = useState(false);
 
-  const filteredTopics =
-    activeCategory === 'all'
-      ? mockTopics
-      : mockTopics.filter((t) => t.category === activeCategory);
+  useEffect(() => {
+    fetchTopics();
+  }, [activeCategory]);
+
+  const fetchTopics = async () => {
+    setLoading(true);
+    let query = supabase
+      .from('topics')
+      .select('*')
+      .order('last_activity', { ascending: false });
+
+    if (activeCategory !== 'all') {
+      query = query.eq('category', activeCategory);
+    }
+
+    const { data } = await query;
+    setTopics(data || []);
+    setLoading(false);
+  };
+
+  const handleNewTopic = async ({ title, category, content }) => {
+    const authorName =
+      user.user_metadata?.full_name || user.email.split('@')[0];
+
+    const { data: topic } = await supabase
+      .from('topics')
+      .insert({ title, category, author_id: user.id, author_name: authorName })
+      .select()
+      .single();
+
+    if (topic && content.trim()) {
+      await supabase.from('posts').insert({
+        topic_id: topic.id,
+        author_id: user.id,
+        author_name: authorName,
+        content,
+      });
+    }
+
+    // Auto-follow the topic you created
+    if (topic) {
+      await supabase
+        .from('topic_followers')
+        .upsert(
+          { topic_id: topic.id, user_id: user.id, email: user.email },
+          { onConflict: 'topic_id,user_id' }
+        );
+    }
+
+    setShowNewTopic(false);
+    fetchTopics();
+  };
 
   return (
     <div className="pt-24">
@@ -157,7 +195,6 @@ function CommunityDashboard() {
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-            {/* Sidebar - Categories */}
             <aside className="lg:col-span-1">
               <h3 className="font-serif text-lg text-brand mb-4">Categories</h3>
               <div className="space-y-1">
@@ -188,7 +225,6 @@ function CommunityDashboard() {
               </div>
             </aside>
 
-            {/* Main Content */}
             <main className="lg:col-span-3">
               <div className="flex items-center justify-between mb-6">
                 <h2 className="font-serif text-2xl text-brand">
@@ -196,41 +232,154 @@ function CommunityDashboard() {
                     ? 'Recent Discussions'
                     : communityCategories.find((c) => c.id === activeCategory)?.name}
                 </h2>
-                <button className="btn-primary">+ New Topic</button>
+                <button
+                  onClick={() => setShowNewTopic(true)}
+                  className="btn-primary flex items-center gap-2"
+                >
+                  <Plus className="h-4 w-4" />
+                  New Topic
+                </button>
               </div>
 
-              <div className="space-y-3">
-                {filteredTopics.map((topic) => (
-                  <Link
-                    key={topic.id}
-                    href={`/community/topic/${topic.id}`}
-                    className="block border border-brand-border p-4 hover:border-brand transition-base"
-                  >
-                    <div className="flex items-start justify-between gap-4">
-                      <div className="flex-grow">
-                        <h3 className="font-serif text-lg text-brand mb-1">
-                          {topic.title}
-                        </h3>
-                        <div className="flex items-center gap-3 text-xs text-brand-gray">
-                          <span>by {topic.author}</span>
-                          <span>•</span>
-                          <span>{topic.lastActivity}</span>
+              {loading ? (
+                <p className="text-brand-gray text-sm py-8">Loading topics...</p>
+              ) : topics.length === 0 ? (
+                <div className="text-center py-16 border border-brand-border">
+                  <MessageCircle className="h-10 w-10 text-brand-gray mx-auto mb-3 opacity-40" />
+                  <p className="text-brand-gray mb-4">No topics yet. Start the conversation!</p>
+                  <button onClick={() => setShowNewTopic(true)} className="btn-primary">
+                    Create First Topic
+                  </button>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {topics.map((topic) => (
+                    <Link
+                      key={topic.id}
+                      href={`/community/topic/${topic.id}`}
+                      className="block border border-brand-border p-4 hover:border-brand transition-base"
+                    >
+                      <div className="flex items-start justify-between gap-4">
+                        <div className="flex-grow">
+                          <h3 className="font-serif text-lg text-brand mb-1">{topic.title}</h3>
+                          <div className="flex items-center gap-3 text-xs text-brand-gray">
+                            <span>by {topic.author_name}</span>
+                            <span>•</span>
+                            <span>
+                              {new Date(topic.last_activity).toLocaleDateString('en-US', {
+                                month: 'short',
+                                day: 'numeric',
+                              })}
+                            </span>
+                            <span>•</span>
+                            <span className="capitalize">
+                              {communityCategories.find((c) => c.id === topic.category)?.name ||
+                                topic.category}
+                            </span>
+                          </div>
+                        </div>
+                        <div className="text-right text-xs text-brand-gray shrink-0">
+                          <div className="flex items-center gap-1">
+                            <MessageCircle className="h-3 w-3" />
+                            {topic.reply_count}
+                          </div>
                         </div>
                       </div>
-                      <div className="text-right text-xs text-brand-gray">
-                        <div className="flex items-center gap-1">
-                          <MessageCircle className="h-3 w-3" />
-                          {topic.replies}
-                        </div>
-                      </div>
-                    </div>
-                  </Link>
-                ))}
-              </div>
+                    </Link>
+                  ))}
+                </div>
+              )}
             </main>
           </div>
         </div>
       </section>
+
+      {showNewTopic && (
+        <NewTopicModal
+          onSubmit={handleNewTopic}
+          onClose={() => setShowNewTopic(false)}
+        />
+      )}
+    </div>
+  );
+}
+
+function NewTopicModal({ onSubmit, onClose }) {
+  const [title, setTitle] = useState('');
+  const [category, setCategory] = useState(communityCategories[0]?.id || '');
+  const [content, setContent] = useState('');
+  const [saving, setSaving] = useState(false);
+
+  const handleSubmit = async () => {
+    if (!title.trim() || !content.trim()) return;
+    setSaving(true);
+    await onSubmit({ title, category, content });
+    setSaving(false);
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+      <div className="bg-white w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+        <div className="flex items-center justify-between p-6 border-b border-brand-border">
+          <h2 className="font-serif text-2xl text-brand">New Topic</h2>
+          <button onClick={onClose} className="text-brand-gray hover:text-brand">
+            <X className="h-5 w-5" />
+          </button>
+        </div>
+
+        <div className="p-6 space-y-4">
+          <div>
+            <label className="block text-sm text-brand-gray mb-1">Title *</label>
+            <input
+              type="text"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              className="w-full px-3 py-2 border border-brand-border"
+              placeholder="What do you want to discuss?"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm text-brand-gray mb-1">Category</label>
+            <select
+              value={category}
+              onChange={(e) => setCategory(e.target.value)}
+              className="w-full px-3 py-2 border border-brand-border"
+            >
+              {communityCategories.map((cat) => (
+                <option key={cat.id} value={cat.id}>
+                  {cat.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-sm text-brand-gray mb-1">Your message *</label>
+            <textarea
+              rows={6}
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
+              className="w-full px-3 py-2 border border-brand-border resize-none"
+              placeholder="Share your thoughts, question, or experience..."
+            />
+          </div>
+        </div>
+
+        <div className="flex gap-3 p-6 border-t border-brand-border">
+          <button
+            onClick={handleSubmit}
+            disabled={!title.trim() || !content.trim() || saving}
+            className="btn-primary flex items-center gap-2 disabled:opacity-50"
+          >
+            <Send className="h-4 w-4" />
+            {saving ? 'Posting...' : 'Post Topic'}
+          </button>
+          <button onClick={onClose} className="btn-secondary">
+            Cancel
+          </button>
+        </div>
+      </div>
     </div>
   );
 }
