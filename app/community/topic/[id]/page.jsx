@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, use } from 'react';
 import Link from 'next/link';
 import { ArrowLeft, Send, Bell, BellOff } from 'lucide-react';
 import { supabase, getCurrentUser, getUserSubscription } from '@/lib/supabase';
@@ -9,6 +9,7 @@ import { communityCategories } from '@/data/community';
 const ADMIN_EMAIL = 'eliobardho7@gmail.com';
 
 export default function TopicPage({ params }) {
+  const { id: routeId } = use(params);
   const [user, setUser] = useState(null);
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [topic, setTopic] = useState(null);
@@ -36,7 +37,7 @@ export default function TopicPage({ params }) {
         const { data: follow } = await supabase
           .from('topic_followers')
           .select('id')
-          .eq('topic_id', params.id)
+          .eq('topic_id', routeId)
           .eq('user_id', currentUser.id)
           .single();
         setIsFollowing(!!follow);
@@ -45,21 +46,21 @@ export default function TopicPage({ params }) {
       const { data: topicData } = await supabase
         .from('topics')
         .select('*')
-        .eq('id', params.id)
+        .eq('id', routeId)
         .single();
       setTopic(topicData);
 
       const { data: postsData } = await supabase
         .from('posts')
         .select('*')
-        .eq('topic_id', params.id)
+        .eq('topic_id', routeId)
         .order('created_at', { ascending: true });
       setPosts(postsData || []);
 
       setLoading(false);
     }
     load();
-  }, [params.id]);
+  }, [routeId]);
 
   const toggleFollow = async () => {
     if (!user) return;
@@ -69,12 +70,12 @@ export default function TopicPage({ params }) {
       await supabase
         .from('topic_followers')
         .delete()
-        .eq('topic_id', params.id)
+        .eq('topic_id', routeId)
         .eq('user_id', user.id);
       setIsFollowing(false);
     } else {
       await supabase.from('topic_followers').insert({
-        topic_id: parseInt(params.id),
+        topic_id: parseInt(routeId),
         user_id: user.id,
         email: user.email,
       });
@@ -91,7 +92,7 @@ export default function TopicPage({ params }) {
     const authorName = user.user_metadata?.full_name || user.email.split('@')[0];
 
     await supabase.from('posts').insert({
-      topic_id: parseInt(params.id),
+      topic_id: parseInt(routeId),
       author_id: user.id,
       author_name: authorName,
       content: reply,
@@ -103,14 +104,14 @@ export default function TopicPage({ params }) {
         reply_count: (topic.reply_count || 0) + 1,
         last_activity: new Date().toISOString(),
       })
-      .eq('id', params.id);
+      .eq('id', routeId);
 
     // Auto-follow the topic when replying
     if (!isFollowing) {
       await supabase
         .from('topic_followers')
         .upsert(
-          { topic_id: parseInt(params.id), user_id: user.id, email: user.email },
+          { topic_id: parseInt(routeId), user_id: user.id, email: user.email },
           { onConflict: 'topic_id,user_id' }
         );
       setIsFollowing(true);
@@ -121,7 +122,7 @@ export default function TopicPage({ params }) {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        topicId: parseInt(params.id),
+        topicId: parseInt(routeId),
         topicTitle: topic.title,
         authorName,
         postContent: reply,
@@ -132,7 +133,7 @@ export default function TopicPage({ params }) {
     const { data } = await supabase
       .from('posts')
       .select('*')
-      .eq('topic_id', params.id)
+      .eq('topic_id', routeId)
       .order('created_at', { ascending: true });
 
     setPosts(data || []);

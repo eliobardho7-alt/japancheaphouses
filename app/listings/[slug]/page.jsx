@@ -11,7 +11,8 @@ export async function generateStaticParams() {
 }
 
 export async function generateMetadata({ params }) {
-  const listing = getListingBySlug(params.slug);
+  const { slug } = await params;
+  const listing = getListingBySlug(slug);
   if (!listing) return {};
 
   const url = `/listings/${listing.slug}`;
@@ -37,8 +38,9 @@ export async function generateMetadata({ params }) {
   };
 }
 
-export default function ListingDetailPage({ params }) {
-  const listing = getListingBySlug(params.slug);
+export default async function ListingDetailPage({ params }) {
+  const { slug } = await params;
+  const listing = getListingBySlug(slug);
   if (!listing) notFound();
 
   // TODO: Check user subscription status server-side

@@ -38,7 +38,8 @@ async function getRelated(listing, limit = 4) {
 }
 
 export async function generateMetadata({ params }) {
-  const listing = await getListing(params.id);
+  const { id } = await params;
+  const listing = await getListing(id);
   if (!listing) return { title: 'Property not found' };
 
   return {
@@ -145,7 +146,8 @@ function renderMarkdown(md) {
 }
 
 export default async function PropertyBlogPage({ params }) {
-  const listing = await getListing(params.id);
+  const { id } = await params;
+  const listing = await getListing(id);
   if (!listing) notFound();
 
   const related = await getRelated(listing);
