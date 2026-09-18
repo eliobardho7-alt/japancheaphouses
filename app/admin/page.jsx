@@ -9,6 +9,7 @@ import {
   Calendar,
   Mail,
   LogOut,
+  TrendingUp,
 } from 'lucide-react';
 import { getCurrentUser, signOut } from '@/lib/supabase';
 
@@ -38,7 +39,7 @@ export default function AdminDashboard() {
           const data = await res.json();
           if (!cancelled) setStats(data);
         } else if (res.status === 401 || res.status === 403) {
-          router.push('/login');
+          router.push('/login?redirect=/admin');
         }
       } catch (error) {
         console.error('Admin load error:', error);
@@ -131,6 +132,13 @@ export default function AdminDashboard() {
             <Mail className="h-8 w-8 text-brand-accent mb-3" />
             <h3 className="font-serif text-lg text-brand mb-2">Messages</h3>
             <p className="text-sm text-brand-gray mb-3">Read messages submitted through the contact form.</p>
+            <span className="text-sm text-brand-accent">Open →</span>
+          </Link>
+
+          <Link href="/admin/metrics" className="bg-white border border-brand-border p-6 card-hover block">
+            <TrendingUp className="h-8 w-8 text-brand-accent mb-3" />
+            <h3 className="font-serif text-lg text-brand mb-2">Metrics</h3>
+            <p className="text-sm text-brand-gray mb-3">Activity feed, charts, and totals across all site events.</p>
             <span className="text-sm text-brand-accent">Open →</span>
           </Link>
         </div>

@@ -49,6 +49,11 @@ export default function SignupPage() {
 
     try {
       await signUp(formData.email, formData.password, formData.fullName);
+      fetch('/api/signup-notify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: formData.email, name: formData.fullName }),
+      }).catch(() => {});
       router.push('/community');
     } catch (err) {
       setError(err.message || 'Failed to create account.');

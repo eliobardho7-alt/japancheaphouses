@@ -61,6 +61,31 @@ export async function POST(request) {
             { onConflict: 'user_id' }
           );
         }
+
+        if (process.env.RESEND_API_KEY) {
+          const adminEmail = process.env.ADMIN_EMAIL || 'eliobardho7@gmail.com';
+          const fromAddress = process.env.RESEND_FROM_EMAIL || 'onboarding@resend.dev';
+          const customerEmail = session.customer_email || 'unknown';
+          await fetch('https://api.resend.com/emails', {
+            method: 'POST',
+            headers: {
+              Authorization: `Bearer ${process.env.RESEND_API_KEY}`,
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              from: `Yama Vista <${fromAddress}>`,
+              to: [adminEmail],
+              subject: `New Subscriber: ${customerEmail}`,
+              html: `<div style="font-family:sans-serif;max-width:600px;margin:auto;">
+  <h2>New Subscription</h2>
+  <p><strong>Email:</strong> ${customerEmail}</p>
+  <p><strong>Stripe Customer:</strong> ${session.customer || 'N/A'}</p>
+  <p><strong>Subscription ID:</strong> ${session.subscription || 'N/A'}</p>
+  <p style="color:#6b7280;font-size:12px;">Checkout session completed at ${new Date().toUTCString()}</p>
+</div>`,
+            }),
+          }).catch((e) => console.error('Resend stripe notification error:', e));
+        }
         break;
       }
 

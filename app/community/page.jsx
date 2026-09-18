@@ -179,6 +179,21 @@ function CommunityDashboard({ user }) {
         );
     }
 
+    if (topic) {
+      fetch('/api/community/notify-admin', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title,
+          category,
+          authorName: authorName,
+          authorEmail: user.email,
+          content,
+          topicId: topic.id,
+        }),
+      }).catch(() => {});
+    }
+
     setShowNewTopic(false);
     fetchTopics();
   };

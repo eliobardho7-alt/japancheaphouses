@@ -1,16 +1,22 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, Suspense } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import { Mail, Lock, ArrowRight } from 'lucide-react';
 import { signIn } from '@/lib/supabase';
 
-export default function LoginPage() {
-  const router = useRouter();
+function LoginForm() {
+  const searchParams = useSearchParams();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const urlError =
+    searchParams.get('error') === 'unauthorized'
+      ? 'That account does not have admin access. Sign in with the admin email.'
+      : searchParams.get('error') === 'admin_disabled'
+      ? 'Admin access is not configured.'
+      : '';
+  const [error, setError] = useState(urlError);
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
@@ -20,10 +26,14 @@ export default function LoginPage() {
 
     try {
       await signIn(email, password);
-      router.push('/community');
+      const redirect = searchParams.get('redirect');
+      const dest = redirect && redirect.startsWith('/') ? redirect : '/community';
+      // Hard navigation (not router.push) so the freshly-set auth cookie is
+      // sent on the next request — required for the /admin proxy guard to see
+      // the session instead of bouncing back to /login.
+      window.location.assign(dest);
     } catch (err) {
       setError(err.message || 'Failed to sign in. Check your email and password.');
-    } finally {
       setLoading(false);
     }
   };
@@ -103,5 +113,13 @@ export default function LoginPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense>
+      <LoginForm />
+    </Suspense>
   );
 }
