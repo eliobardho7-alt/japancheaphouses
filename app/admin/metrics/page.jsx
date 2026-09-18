@@ -108,7 +108,28 @@ export default function MetricsPage() {
   };
 
   useEffect(() => {
-    load();
+    // Deliberately not calling load() here: it sets state synchronously, which
+    // inside an effect cascades renders (react-hooks/set-state-in-effect).
+    // `loading` already starts true, so the mount path only needs to set state
+    // after the fetch resolves. The Refresh button still uses load().
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch('/api/admin/metrics', { cache: 'no-store' });
+        if (!res.ok) throw new Error(`${res.status}`);
+        const json = await res.json();
+        if (cancelled) return;
+        setData(json);
+        setLastRefresh(new Date());
+      } catch (e) {
+        if (!cancelled) setError(e.message);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   const statCards = data

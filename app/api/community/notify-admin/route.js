@@ -1,7 +1,14 @@
 import { NextResponse } from 'next/server';
 import { escapeHtml, sanitizeHeader } from '@/lib/escape-html';
+import { rateLimit } from '@/lib/rate-limit';
 
 export async function POST(request) {
+  // Unauthenticated by design (it fires right after a topic insert), and it
+  // only ever mails the admin — but without a limit anyone can flood that
+  // inbox and burn the Resend quota. Fail quietly: never block topic creation.
+  const rl = rateLimit(request, { key: 'notify-admin', limit: 5, windowMs: 60_000 });
+  if (!rl.ok) return NextResponse.json({ ok: true });
+
   try {
     const body = await request.json();
     const { title, category, authorName, authorEmail, content, topicId } = body || {};

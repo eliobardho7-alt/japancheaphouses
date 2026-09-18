@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { createClient } from '@supabase/supabase-js';
+import { escapeHtml, sanitizeHeader } from '@/lib/escape-html';
 
 // Stripe webhook for subscription lifecycle.
 // Configure in Stripe Dashboard with: checkout.session.completed,
@@ -87,14 +88,14 @@ export async function POST(request) {
               'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-              from: `Yama Vista <${fromAddress}>`,
-              to: [adminEmail],
-              subject: `New Subscriber: ${customerEmail}`,
+              from: `Yama Vista <${sanitizeHeader(fromAddress)}>`,
+              to: [sanitizeHeader(adminEmail)],
+              subject: sanitizeHeader(`New Subscriber: ${customerEmail}`),
               html: `<div style="font-family:sans-serif;max-width:600px;margin:auto;">
   <h2>New Subscription</h2>
-  <p><strong>Email:</strong> ${customerEmail}</p>
-  <p><strong>Stripe Customer:</strong> ${session.customer || 'N/A'}</p>
-  <p><strong>Subscription ID:</strong> ${session.subscription || 'N/A'}</p>
+  <p><strong>Email:</strong> ${escapeHtml(customerEmail)}</p>
+  <p><strong>Stripe Customer:</strong> ${escapeHtml(session.customer || 'N/A')}</p>
+  <p><strong>Subscription ID:</strong> ${escapeHtml(session.subscription || 'N/A')}</p>
   <p style="color:#6b7280;font-size:12px;">Checkout session completed at ${new Date().toUTCString()}</p>
 </div>`,
             }),
