@@ -1,0 +1,27 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24.x
+          cache: npm
+
+      # `npm ci` installs exactly what package-lock.json specifies, so this job
+      # also fails if the lockfile drifts out of sync with package.json.
+      - run: npm ci
+
+      - run: npm run lint
+
+      - run: npm run build
+
+      - run: npm audit --audit-level=high
