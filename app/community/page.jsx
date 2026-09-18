@@ -6,7 +6,7 @@ import { Lock, MessageCircle, Users, TrendingUp, Plus, X, Send } from 'lucide-re
 import { communityCategories } from '@/data/community';
 import { supabase, getCurrentUser, getUserSubscription } from '@/lib/supabase';
 
-const ADMIN_EMAIL = 'eliobardho7@gmail.com';
+import { ADMIN_EMAIL } from '@/lib/constants';
 
 export default function CommunityPage() {
   const [user, setUser] = useState(null);

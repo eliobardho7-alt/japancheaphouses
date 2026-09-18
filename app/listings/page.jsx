@@ -6,7 +6,7 @@ import { Lock, Filter, MapPin } from 'lucide-react';
 import { listings as staticListings } from '@/data/listings';
 import { supabase, getCurrentUser, getUserSubscription } from '@/lib/supabase';
 
-const ADMIN_EMAIL = 'eliobardho7@gmail.com';
+import { ADMIN_EMAIL } from '@/lib/constants';
 
 // Normalize a static-data listing into the unified shape used by the cards.
 function fromStatic(item) {

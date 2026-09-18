@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import { ArrowLeft, Mail, MessageSquare } from 'lucide-react';
 import { supabase, getCurrentUser } from '@/lib/supabase';
 
-const ADMIN_EMAIL = 'eliobardho7@gmail.com';
+import { ADMIN_EMAIL } from '@/lib/constants';
 
 export default function AdminMessagesPage() {
   const router = useRouter();

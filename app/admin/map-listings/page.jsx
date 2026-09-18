@@ -8,7 +8,17 @@ import {
 } from 'lucide-react';
 import { supabase, getCurrentUser } from '@/lib/supabase';
 
-const ADMIN_EMAIL = 'eliobardho7@gmail.com';
+import { ADMIN_EMAIL } from '@/lib/constants';
+
+// Manual entries get a synthetic source_url so they do not collide with
+// scraped ones. Kept at module scope: Date.now() must not run during render.
+function manualSourceUrl(title) {
+  const slug = String(title || '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .slice(0, 40);
+  return `manual://${Date.now()}-${slug}`;
+}
 
 const PREFECTURES = [
   'Hokkaido', 'Aomori', 'Iwate', 'Miyagi', 'Akita', 'Yamagata', 'Fukushima',
@@ -74,10 +84,9 @@ export default function AdminMapListingsPage() {
       alert('Supabase not configured.');
       return;
     }
-    // Manual entries get a synthetic source_url so they don't collide with scraped ones
     const finalListing = {
       ...listing,
-      source_url: listing.source_url || `manual://${Date.now()}-${listing.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').slice(0, 40)}`,
+      source_url: listing.source_url || manualSourceUrl(listing.title),
     };
 
     if (isCreating) {

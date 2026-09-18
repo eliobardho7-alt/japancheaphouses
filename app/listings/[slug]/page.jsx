@@ -5,10 +5,11 @@ import { MapPin, ArrowLeft, Lock, Home, Calendar } from 'lucide-react';
 import { listings, getListingBySlug } from '@/data/listings';
 import { realEstateListingJsonLd, breadcrumbList } from '@/lib/jsonld';
 import ViewGate from '@/components/ViewGate';
+import { getViewerAccess } from '@/lib/subscription';
 
-export async function generateStaticParams() {
-  return listings.map((listing) => ({ slug: listing.slug }));
-}
+// Premium gating reads the signed-in viewer's subscription from cookies, so
+// these pages must render per-request rather than being prerendered at build.
+export const dynamic = 'force-dynamic';
 
 export async function generateMetadata({ params }) {
   const { slug } = await params;
@@ -43,8 +44,7 @@ export default async function ListingDetailPage({ params }) {
   const listing = getListingBySlug(slug);
   if (!listing) notFound();
 
-  // TODO: Check user subscription status server-side
-  const isSubscribed = false;
+  const { isSubscribed } = await getViewerAccess();
   const showFullContent = !listing.isPremium || isSubscribed;
 
   const jsonLd = [
@@ -61,7 +61,7 @@ export default async function ListingDetailPage({ params }) {
     <article className="pt-24">
       <script
         type="application/ld+json"
-        // eslint-disable-next-line react/no-danger
+
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       <div className="container-custom max-w-4xl py-12">

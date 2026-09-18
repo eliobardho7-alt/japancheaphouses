@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { Eye } from 'lucide-react';
 import { supabase, getCurrentUser } from '@/lib/supabase';
 
-const ADMIN_EMAIL = 'eliobardho7@gmail.com';
+import { ADMIN_EMAIL } from '@/lib/constants';
 
 const RPC_CONFIG = {
   listing: { rpc: 'increment_listing_view', arg: 'listing_id' },

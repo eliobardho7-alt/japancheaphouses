@@ -9,7 +9,7 @@ import { Lock, MapPin, Filter, X } from 'lucide-react';
 import { listings as staticListings } from '@/data/listings';
 import { supabase, getCurrentUser, getUserSubscription } from '@/lib/supabase';
 
-const ADMIN_EMAIL = 'eliobardho7@gmail.com';
+import { ADMIN_EMAIL } from '@/lib/constants';
 const JAPAN_CENTER = [37.5, 137.5];
 const JAPAN_ZOOM = 5;
 

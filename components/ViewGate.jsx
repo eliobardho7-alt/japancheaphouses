@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { Lock, Clock } from 'lucide-react';
 import { getCurrentUser, getUserSubscription } from '@/lib/supabase';
 
-const ADMIN_EMAIL = 'eliobardho7@gmail.com';
+import { ADMIN_EMAIL } from '@/lib/constants';
 const DAILY_VIEW_LIMIT = 5;
 const STORAGE_KEY = 'jch_listing_views_v1';
 
@@ -20,7 +20,7 @@ const STORAGE_KEY = 'jch_listing_views_v1';
  */
 export default function ViewGate({ listingId, children }) {
   const [blocked, setBlocked] = useState(false);
-  const [resetAt, setResetAt] = useState(null);
+  const [resetHours, setResetHours] = useState(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -57,8 +57,12 @@ export default function ViewGate({ listingId, children }) {
         // Compute next-day reset for the countdown message
         const tomorrow = new Date();
         tomorrow.setUTCHours(24, 0, 0, 0);
+        const hours = Math.max(
+          1,
+          Math.ceil((tomorrow.getTime() - Date.now()) / (1000 * 60 * 60))
+        );
         if (!cancelled) {
-          setResetAt(tomorrow);
+          setResetHours(hours);
           setBlocked(true);
         }
         return;
@@ -112,15 +116,10 @@ export default function ViewGate({ listingId, children }) {
               </Link>
             </div>
 
-            {resetAt && (
+            {resetHours !== null && (
               <p className="text-xs text-brand-gray mt-6 flex items-center justify-center gap-1">
                 <Clock className="h-3 w-3" />
-                Free limit resets in{' '}
-                {Math.max(
-                  1,
-                  Math.ceil((resetAt.getTime() - Date.now()) / (1000 * 60 * 60))
-                )}{' '}
-                hours
+                Free limit resets in {resetHours} hours
               </p>
             )}
           </div>

@@ -6,6 +6,20 @@ import { createClient } from '@supabase/supabase-js';
 // Configure in Stripe Dashboard with: checkout.session.completed,
 // customer.subscription.updated, customer.subscription.deleted.
 
+/**
+ * `current_period_end` moved from the subscription onto its items in Stripe's
+ * 2025-03-31 API version. Read whichever shape this account sends, and skip
+ * the column entirely rather than writing an invalid date (which would throw,
+ * 500, and leave Stripe retrying the event forever).
+ */
+function subscriptionPeriodEnd(subscription) {
+  const seconds =
+    subscription?.current_period_end ??
+    subscription?.items?.data?.[0]?.current_period_end;
+  if (!Number.isFinite(seconds)) return null;
+  return new Date(seconds * 1000).toISOString();
+}
+
 export async function POST(request) {
   if (!process.env.STRIPE_SECRET_KEY || !process.env.STRIPE_WEBHOOK_SECRET) {
     return NextResponse.json({ error: 'Stripe not configured' }, { status: 500 });
@@ -93,12 +107,12 @@ export async function POST(request) {
       case 'customer.subscription.deleted': {
         const subscription = event.data.object;
         if (supabase) {
+          const update = { status: subscription.status };
+          const periodEnd = subscriptionPeriodEnd(subscription);
+          if (periodEnd) update.current_period_end = periodEnd;
           await supabase
             .from('subscriptions')
-            .update({
-              status: subscription.status,
-              current_period_end: new Date(subscription.current_period_end * 1000).toISOString(),
-            })
+            .update(update)
             .eq('stripe_subscription_id', subscription.id);
         }
         break;

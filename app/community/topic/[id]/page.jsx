@@ -6,7 +6,7 @@ import { ArrowLeft, Send, Bell, BellOff } from 'lucide-react';
 import { supabase, getCurrentUser, getUserSubscription } from '@/lib/supabase';
 import { communityCategories } from '@/data/community';
 
-const ADMIN_EMAIL = 'eliobardho7@gmail.com';
+import { ADMIN_EMAIL } from '@/lib/constants';
 
 export default function TopicPage({ params }) {
   const { id: routeId } = use(params);
@@ -91,12 +91,16 @@ export default function TopicPage({ params }) {
 
     const authorName = user.user_metadata?.full_name || user.email.split('@')[0];
 
-    await supabase.from('posts').insert({
-      topic_id: parseInt(routeId),
-      author_id: user.id,
-      author_name: authorName,
-      content: reply,
-    });
+    const { data: newPost } = await supabase
+      .from('posts')
+      .insert({
+        topic_id: parseInt(routeId),
+        author_id: user.id,
+        author_name: authorName,
+        content: reply,
+      })
+      .select('id')
+      .single();
 
     await supabase
       .from('topics')
@@ -117,18 +121,18 @@ export default function TopicPage({ params }) {
       setIsFollowing(true);
     }
 
-    // Notify other followers
-    await fetch('/api/community/notify', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        topicId: parseInt(routeId),
-        topicTitle: topic.title,
-        authorName,
-        postContent: reply,
-        authorUserId: user.id,
-      }),
-    });
+    // Notify other followers. The API reads the title/author/body back from
+    // the database itself, so we only hand it ids.
+    if (newPost?.id) {
+      await fetch('/api/community/notify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          topicId: parseInt(routeId),
+          postId: newPost.id,
+        }),
+      });
+    }
 
     const { data } = await supabase
       .from('posts')

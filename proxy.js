@@ -32,14 +32,16 @@ export async function proxy(request) {
   const res = NextResponse.next();
   const supabase = createMiddlewareClient({ req: request, res });
 
+  // getUser() revalidates the token with Supabase. getSession() only decodes
+  // the cookie, which the client controls — never authorize on it.
   const {
-    data: { session },
-  } = await supabase.auth.getSession();
+    data: { user },
+  } = await supabase.auth.getUser();
 
   const adminEmail = process.env.ADMIN_EMAIL;
   const norm = (e) => String(e || '').trim().toLowerCase();
 
-  if (!session?.user || !adminEmail || norm(session.user.email) !== norm(adminEmail)) {
+  if (!user || !adminEmail || norm(user.email) !== norm(adminEmail)) {
     return NextResponse.redirect(loginUrl({ error: 'unauthorized' }));
   }
 

@@ -3,12 +3,13 @@ import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import { Calendar, Clock, ArrowLeft, Lock, ExternalLink } from 'lucide-react';
 import { getPostBySlug, blogPosts } from '@/data/blogs';
-import { absoluteUrl, blogPostingJsonLd, breadcrumbList } from '@/lib/jsonld';
+import { blogPostingJsonLd, breadcrumbList } from '@/lib/jsonld';
 import ViewGate from '@/components/ViewGate';
+import { getViewerAccess } from '@/lib/subscription';
 
-export async function generateStaticParams() {
-  return blogPosts.map((post) => ({ slug: post.slug }));
-}
+// Premium gating reads the signed-in viewer's subscription from cookies, so
+// these pages must render per-request rather than being prerendered at build.
+export const dynamic = 'force-dynamic';
 
 export async function generateMetadata({ params }) {
   const { slug } = await params;
@@ -46,8 +47,7 @@ export default async function BlogPostPage({ params }) {
   const post = getPostBySlug(slug);
   if (!post) notFound();
 
-  // TODO: Check user subscription status server-side
-  const isSubscribed = false;
+  const { isSubscribed } = await getViewerAccess();
   const showFullContent = !post.isPremium || isSubscribed;
 
   const jsonLd = [
@@ -64,7 +64,7 @@ export default async function BlogPostPage({ params }) {
     <article className="pt-24">
       <script
         type="application/ld+json"
-        // eslint-disable-next-line react/no-danger
+
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       <div className="container-custom max-w-4xl py-12">
