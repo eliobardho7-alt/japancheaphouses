@@ -55,10 +55,18 @@ export default function GuideSignup({ compact = false, onSuccess }) {
           Your download should have started. We&apos;ve emailed you a copy of the link as well.
         </p>
         {downloadUrl && (
-          <a href={downloadUrl} className="btn-primary inline-flex items-center gap-2">
-            <Download className="h-4 w-4" />
-            Download again
-          </a>
+          <>
+            <a href={downloadUrl} className="btn-primary inline-flex items-center gap-2">
+              <Download className="h-4 w-4" />
+              Download again
+            </a>
+            <a
+              href={`${downloadUrl}&f=pptx`}
+              className="block text-xs text-brand-gray hover:text-brand mt-4 transition-base"
+            >
+              Prefer the editable PowerPoint? Download the .pptx
+            </a>
+          </>
         )}
       </div>
     );
