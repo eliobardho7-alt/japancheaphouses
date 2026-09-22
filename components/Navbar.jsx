@@ -28,6 +28,7 @@ export default function Navbar() {
   ];
 
   const moreLinks = [
+    { href: '/guide', label: 'Free Buyer’s Guide' },
     { href: '/booking', label: 'Free Consultation' },
     { href: '/community', label: 'Community' },
   ];

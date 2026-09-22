@@ -29,6 +29,14 @@ const nextConfig = {
   serverExternalPackages: ['stripe'],
   poweredByHeader: false,
 
+  // The buyer's guide deliberately lives outside public/ so it can only be
+  // fetched through the token-checked download route. Nothing imports it, so
+  // it has to be traced into that route's bundle explicitly or the file is
+  // missing at runtime on Vercel.
+  outputFileTracingIncludes: {
+    '/api/guide/download': ['./assets/**'],
+  },
+
   async headers() {
     return [
       {
