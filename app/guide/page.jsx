@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { FileText, MapPin, Scale, Coins, FileSignature, KeyRound, AlertTriangle } from 'lucide-react';
-import GuideForm from './GuideForm';
+import GuideSignup from '@/components/GuideSignup';
 import { GUIDE } from '@/lib/guide';
 
 export const metadata = {
@@ -105,7 +105,7 @@ export default function GuidePage() {
             </div>
 
             <div className="lg:sticky lg:top-28">
-              <GuideForm />
+              <GuideSignup />
             </div>
           </div>
         </div>

@@ -2,6 +2,7 @@ import { Playfair_Display, Plus_Jakarta_Sans } from 'next/font/google';
 import './globals.css';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
+import GuidePopup from '@/components/GuidePopup';
 import { getSiteUrl } from '@/lib/site-url';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 import Script from 'next/script';
@@ -128,6 +129,7 @@ export default function RootLayout({ children }) {
         <Navbar />
         <main className="flex-grow">{children}</main>
         <Footer />
+        <GuidePopup />
         <SpeedInsights />
         <script
           type="application/ld+json"

@@ -25,10 +25,10 @@ export default function Navbar() {
     { href: '/blog', label: 'Blog' },
     { href: '/services', label: 'Services' },
     { href: '/pricing', label: 'Plans & Pricing' },
+    { href: '/guide', label: 'Free Guide' },
   ];
 
   const moreLinks = [
-    { href: '/guide', label: 'Free Buyer’s Guide' },
     { href: '/booking', label: 'Free Consultation' },
     { href: '/community', label: 'Community' },
   ];

@@ -3,7 +3,14 @@
 import { useState } from 'react';
 import { Download, Loader2, Check } from 'lucide-react';
 
-export default function GuideForm() {
+/**
+ * Newsletter-for-guide signup form.
+ *
+ * Shared by the /guide page and the entry popup so the two cannot drift
+ * apart. `compact` tightens it for the modal; `onSuccess` lets the popup
+ * close itself once the download has started.
+ */
+export default function GuideSignup({ compact = false, onSuccess }) {
   const [email, setEmail] = useState('');
   const [website, setWebsite] = useState(''); // honeypot
   const [status, setStatus] = useState('idle'); // idle | loading | done
@@ -31,10 +38,8 @@ export default function GuideForm() {
 
       setDownloadUrl(data.downloadUrl);
       setStatus('done');
-
-      // Start the download straight away; the link stays on screen as a
-      // fallback if the browser blocks the navigation.
       if (data.downloadUrl) window.location.assign(data.downloadUrl);
+      if (onSuccess) onSuccess();
     } catch {
       setError('Could not reach the server. Please try again.');
       setStatus('idle');
@@ -43,12 +48,11 @@ export default function GuideForm() {
 
   if (status === 'done') {
     return (
-      <div className="bg-white border border-brand-border p-8 text-center">
+      <div className={compact ? 'text-center' : 'bg-white border border-brand-border p-8 text-center'}>
         <Check className="h-10 w-10 text-brand-accent mx-auto mb-4" />
         <h3 className="font-serif text-2xl text-brand mb-3">You&apos;re subscribed</h3>
         <p className="text-brand-gray mb-6">
-          Your download should have started. We&apos;ve emailed you a copy of the
-          link as well.
+          Your download should have started. We&apos;ve emailed you a copy of the link as well.
         </p>
         {downloadUrl && (
           <a href={downloadUrl} className="btn-primary inline-flex items-center gap-2">
@@ -60,20 +64,28 @@ export default function GuideForm() {
     );
   }
 
-  return (
-    <form onSubmit={handleSubmit} className="bg-white border border-brand-border p-8">
-      <h3 className="font-serif text-2xl text-brand mb-2">Get the guide free</h3>
-      <p className="text-sm text-brand-gray mb-6">
-        Enter your email and the {' '}
-        <span className="whitespace-nowrap">29-slide</span> guide downloads
-        immediately.
-      </p>
+  const inputId = compact ? 'popup-guide-email' : 'guide-email';
 
-      <label htmlFor="guide-email" className="block text-sm text-brand mb-2">
+  return (
+    <form
+      onSubmit={handleSubmit}
+      className={compact ? '' : 'bg-white border border-brand-border p-8'}
+    >
+      {!compact && (
+        <>
+          <h3 className="font-serif text-2xl text-brand mb-2">Get the guide free</h3>
+          <p className="text-sm text-brand-gray mb-6">
+            Enter your email and the <span className="whitespace-nowrap">29-slide</span> guide
+            downloads immediately.
+          </p>
+        </>
+      )}
+
+      <label htmlFor={inputId} className="block text-sm text-brand mb-2">
         Email address
       </label>
       <input
-        id="guide-email"
+        id={inputId}
         type="email"
         required
         value={email}
@@ -84,9 +96,9 @@ export default function GuideForm() {
 
       {/* Honeypot: hidden from people, irresistible to bots. */}
       <div className="hidden" aria-hidden="true">
-        <label htmlFor="guide-website">Website</label>
+        <label htmlFor={`${inputId}-website`}>Website</label>
         <input
-          id="guide-website"
+          id={`${inputId}-website`}
           type="text"
           tabIndex={-1}
           autoComplete="off"
@@ -116,9 +128,8 @@ export default function GuideForm() {
       </button>
 
       <p className="text-xs text-brand-gray mt-4">
-        Submitting subscribes you to the Yama Vista newsletter — listings,
-        market notes and buying advice. Unsubscribe any time. We never sell
-        your address.
+        Submitting subscribes you to the Yama Vista newsletter — listings, market notes and
+        buying advice. Unsubscribe any time. We never sell your address.
       </p>
     </form>
   );

@@ -43,7 +43,7 @@ export async function POST(request) {
 
   const normalized = normalizeEmail(email);
 
-  const stored = await storeSubscriber(normalized);
+  const stored = await storeSubscriber(normalized, 'buyers-guide');
   if (!stored) {
     return NextResponse.json(
       { error: 'We could not complete your subscription. Please try again shortly.' },

@@ -26,7 +26,7 @@ export async function POST(request) {
     // Unlike the guide form, this one is collection-only: if the store fails
     // we still report success rather than making the visitor retry, because
     // nothing is being handed over in exchange.
-    await storeSubscriber(normalized);
+    await storeSubscriber(normalized, 'footer-form');
     await notifyAdminOfSubscriber(normalized, 'footer newsletter form');
 
     return NextResponse.json({ success: true });
