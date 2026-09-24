@@ -3,6 +3,7 @@ import Stripe from 'stripe';
 import { getServerSupabase } from '@/lib/supabase-server';
 import { rateLimit } from '@/lib/rate-limit';
 import { getSiteUrl } from '@/lib/site-url';
+import { MEMBERSHIPS_ENABLED } from '@/lib/membership';
 
 /**
  * Founders' offer pricing structure
@@ -32,6 +33,16 @@ async function buildDiscountParam(stripe, value) {
 }
 
 export async function POST(request) {
+  // Memberships are off. Refuse here as well as hiding the buttons — otherwise
+  // anyone posting to this endpoint directly could still start a subscription
+  // for something the site now gives away.
+  if (!MEMBERSHIPS_ENABLED) {
+    return NextResponse.json(
+      { error: 'Everything on the site is free right now — there is nothing to subscribe to.' },
+      { status: 410 }
+    );
+  }
+
   // Rate limit checkout creation
   const rl = rateLimit(request, { key: 'stripe-checkout', limit: 10, windowMs: 60_000 });
   if (!rl.ok) {

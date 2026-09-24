@@ -1,7 +1,7 @@
 export const metadata = {
-  title: 'Plans & Pricing — Community membership at $5/month',
+  title: 'Pricing — everything is free',
   description:
-    'Free access to public listings and articles, or join the Community membership for $5/month to unlock premium listings, direct messaging, and member discussions.',
+    'There is no membership and nothing to pay for. Every listing, price, article and the full buyer’s guide are open to everyone. Consultations are booked individually.',
   alternates: { canonical: '/pricing' },
 };
 

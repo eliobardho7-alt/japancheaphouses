@@ -4,6 +4,7 @@ import { ArrowRight, Calendar, Home, Search } from 'lucide-react';
 import { services } from '@/data/services';
 import { getFeaturedPosts } from '@/data/blogs';
 import { listings } from '@/data/listings';
+import { MEMBERSHIPS_ENABLED } from '@/lib/membership';
 
 export default function HomePage() {
   const featuredPosts = getFeaturedPosts(2);
@@ -199,15 +200,16 @@ export default function HomePage() {
                 className="bg-white border border-brand-border card-hover overflow-hidden group block"
               >
                 <div className="relative aspect-[4/3] bg-gradient-to-br from-gray-200 to-gray-300">
-                  {listing.isPremium ? (
-                    <div className="absolute top-3 right-3 bg-brand-accent text-white px-2 py-1 text-xs">
-                      Premium
-                    </div>
-                  ) : (
-                    <div className="absolute top-3 right-3 bg-green-600 text-white px-2 py-1 text-xs">
-                      Free
-                    </div>
-                  )}
+                  {MEMBERSHIPS_ENABLED &&
+                    (listing.isPremium ? (
+                      <div className="absolute top-3 right-3 bg-brand-accent text-white px-2 py-1 text-xs">
+                        Premium
+                      </div>
+                    ) : (
+                      <div className="absolute top-3 right-3 bg-green-600 text-white px-2 py-1 text-xs">
+                        Free
+                      </div>
+                    ))}
                   <div className="absolute inset-0 flex items-center justify-center">
                     <span className="text-5xl opacity-30">🏡</span>
                   </div>

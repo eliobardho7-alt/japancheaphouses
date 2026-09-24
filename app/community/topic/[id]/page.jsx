@@ -4,6 +4,7 @@ import { useState, useEffect, use } from 'react';
 import Link from 'next/link';
 import { ArrowLeft, Send, Bell, BellOff } from 'lucide-react';
 import { supabase, getCurrentUser, getUserSubscription } from '@/lib/supabase';
+import { MEMBERSHIPS_ENABLED } from '@/lib/membership';
 import { communityCategories } from '@/data/community';
 
 import { ADMIN_EMAIL } from '@/lib/constants';
@@ -11,7 +12,7 @@ import { ADMIN_EMAIL } from '@/lib/constants';
 export default function TopicPage({ params }) {
   const { id: routeId } = use(params);
   const [user, setUser] = useState(null);
-  const [isSubscribed, setIsSubscribed] = useState(false);
+  const [isSubscribed, setIsSubscribed] = useState(!MEMBERSHIPS_ENABLED);
   const [topic, setTopic] = useState(null);
   const [posts, setPosts] = useState([]);
   const [reply, setReply] = useState('');
@@ -29,7 +30,7 @@ export default function TopicPage({ params }) {
         if (currentUser.email === ADMIN_EMAIL) {
           setIsSubscribed(true);
         } else {
-          const sub = await getUserSubscription(currentUser.id);
+          const sub = MEMBERSHIPS_ENABLED ? await getUserSubscription(currentUser.id) : true;
           setIsSubscribed(!!sub);
         }
 

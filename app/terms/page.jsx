@@ -37,7 +37,7 @@ export default function TermsPage() {
 
             <h2 className="font-serif text-2xl text-brand mt-10 mb-3">Subscriptions and payments</h2>
             <p>
-              Paid plans are billed monthly via Stripe at the price displayed on the <Link href="/pricing" className="underline">pricing page</Link>. Subscriptions renew automatically until cancelled. You can cancel at any time and will retain access through the end of the current billing period. We do not offer refunds for partial periods.
+              There are currently no paid plans and no subscriptions. Everything on this site is free to use, as described on the <Link href="/pricing" className="underline">pricing page</Link>. Consultations are arranged and paid for individually by agreement. If paid plans are introduced in future, the terms and prices will be published here and on the pricing page before they take effect.
             </p>
 
             <h2 className="font-serif text-2xl text-brand mt-10 mb-3">Listings and information</h2>

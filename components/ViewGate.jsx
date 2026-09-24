@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Lock, Clock } from 'lucide-react';
 import { getCurrentUser, getUserSubscription } from '@/lib/supabase';
+import { MEMBERSHIPS_ENABLED } from '@/lib/membership';
 
 import { ADMIN_EMAIL } from '@/lib/constants';
 const DAILY_VIEW_LIMIT = 5;
@@ -26,6 +27,11 @@ export default function ViewGate({ listingId, children }) {
     let cancelled = false;
 
     async function evaluate() {
+      // Memberships are off: no daily cap, so never count or block a view.
+      // Guarded here rather than with an early return from the component so
+      // the hook order stays stable if the switch is flipped back.
+      if (!MEMBERSHIPS_ENABLED) return;
+
       // Bypass for admin and subscribers
       try {
         const user = await getCurrentUser();

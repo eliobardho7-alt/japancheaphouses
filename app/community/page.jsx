@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { Lock, MessageCircle, Users, TrendingUp, Plus, X, Send } from 'lucide-react';
 import { communityCategories } from '@/data/community';
 import { supabase, getCurrentUser, getUserSubscription } from '@/lib/supabase';
+import { MEMBERSHIPS_ENABLED } from '@/lib/membership';
 
 import { ADMIN_EMAIL } from '@/lib/constants';
 
@@ -19,6 +20,8 @@ export default function CommunityPage() {
       setUser(currentUser);
       if (currentUser) {
         if (currentUser.email === ADMIN_EMAIL) {
+          setIsSubscribed(true);
+        } else if (!MEMBERSHIPS_ENABLED) {
           setIsSubscribed(true);
         } else {
           const sub = await getUserSubscription(currentUser.id);
@@ -53,21 +56,17 @@ function CommunityGate({ user }) {
               Join the Yama Vista Community
             </h1>
             <p className="text-brand-gray max-w-2xl mx-auto mb-8">
-              Connect with fellow real estate enthusiasts, get advice from experienced investors,
-              and access exclusive listings — all for just $5/month.
+              Connect with fellow real estate enthusiasts, get advice from
+              experienced investors, and browse every listing — free. You just
+              need an account so we know who is posting.
             </p>
             <div className="flex gap-4 justify-center">
-              <Link href="/pricing" className="btn-primary">
-                Subscribe Now
+              <Link href="/signup" className="btn-primary">
+                Create a free account
               </Link>
               {!user && (
                 <Link href="/login" className="btn-secondary">
-                  Already a Member? Sign In
-                </Link>
-              )}
-              {user && (
-                <Link href="/pricing" className="btn-secondary">
-                  Upgrade to Access
+                  Already have an account? Sign in
                 </Link>
               )}
             </div>
@@ -90,7 +89,7 @@ function CommunityGate({ user }) {
 
           <div className="bg-brand-light p-12">
             <h2 className="font-serif text-2xl text-brand text-center mb-8">
-              What You Get as a Member
+              What You Get
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               {[

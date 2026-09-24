@@ -24,7 +24,6 @@ export default function Navbar() {
     { href: '/listings', label: 'Listings' },
     { href: '/blog', label: 'Blog' },
     { href: '/services', label: 'Services' },
-    { href: '/pricing', label: 'Plans & Pricing' },
     { href: '/guide', label: 'Free Guide' },
   ];
 

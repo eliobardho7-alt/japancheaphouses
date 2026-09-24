@@ -2,6 +2,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Check } from 'lucide-react';
 import { services } from '@/data/services';
+import { MEMBERSHIPS_ENABLED } from '@/lib/membership';
 
 export const metadata = {
   title: 'Services — Japan Property Inspection, Management & Consulting',
@@ -71,7 +72,7 @@ export default function ServicesPage() {
                     >
                       {service.id === 'consultation' ? 'Request to Book' : 'Book Now'}
                     </Link>
-                    {service.bookingType === 'plans' && (
+                    {MEMBERSHIPS_ENABLED && service.bookingType === 'plans' && (
                       <Link
                         href="/pricing"
                         className="text-sm text-brand underline hover:text-brand-accent text-center"

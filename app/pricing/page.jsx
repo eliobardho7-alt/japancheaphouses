@@ -2,8 +2,9 @@
 
 import Link from 'next/link';
 import { Check, X, Sparkles, Clock, TrendingDown } from 'lucide-react';
+import { MEMBERSHIPS_ENABLED } from '@/lib/membership';
 
-export default function PricingPage() {
+function PaidPlans() {
   const handleSubscribe = async () => {
     try {
       const response = await fetch('/api/stripe/create-checkout', {
@@ -224,6 +225,67 @@ export default function PricingPage() {
               ))}
             </div>
           </div>
+        </div>
+      </section>
+    </div>
+  );
+}
+
+/**
+ * Everything on the site is free at the moment, so this route explains that
+ * instead of selling a plan. The paid markup above is untouched: flipping
+ * MEMBERSHIPS_ENABLED back to true restores it.
+ *
+ * The route itself is kept rather than deleted because the old Wix
+ * /pricing-plans/* URLs still redirect here.
+ */
+export default function PricingPage() {
+  if (MEMBERSHIPS_ENABLED) return <PaidPlans />;
+
+  return (
+    <div className="pt-24">
+      <section className="section-padding bg-white">
+        <div className="container-custom max-w-3xl text-center">
+          <Sparkles className="h-10 w-10 text-brand-accent mx-auto mb-6" />
+          <h1 className="font-serif text-4xl md:text-5xl text-brand mb-6 leading-tight">
+            Everything is free
+          </h1>
+          <p className="text-lg text-brand-gray mb-6">
+            There is no membership and nothing to pay for. Every listing, every
+            price, every article and the full buyer&apos;s guide are open to
+            everyone.
+          </p>
+          <p className="text-brand-gray mb-10">
+            An account is only needed to post in the community, so we know who
+            is writing. If we introduce paid plans later, we will say so
+            clearly — and nothing that is free today will be taken away without
+            notice.
+          </p>
+
+          <div className="flex flex-wrap gap-4 justify-center">
+            <Link href="/guide" className="btn-primary">
+              Get the free buyer&apos;s guide
+            </Link>
+            <Link href="/map" className="btn-secondary">
+              Browse every listing
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      <section className="section-padding bg-brand-light">
+        <div className="container-custom max-w-3xl text-center">
+          <h2 className="font-serif text-3xl text-brand mb-4">
+            Want help with a specific property?
+          </h2>
+          <p className="text-brand-gray mb-8">
+            Consultations are booked individually. Send us a listing and we
+            will check the road, the zoning, the hazard maps and the register
+            before you spend money on a viewing trip.
+          </p>
+          <Link href="/booking" className="btn-primary">
+            Book a free consultation
+          </Link>
         </div>
       </section>
     </div>

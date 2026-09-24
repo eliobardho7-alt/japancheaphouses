@@ -8,6 +8,7 @@ import 'leaflet/dist/leaflet.css';
 import { Lock, MapPin, Filter, X } from 'lucide-react';
 import { listings as staticListings } from '@/data/listings';
 import { supabase, getCurrentUser, getUserSubscription } from '@/lib/supabase';
+import { MEMBERSHIPS_ENABLED } from '@/lib/membership';
 
 import { ADMIN_EMAIL } from '@/lib/constants';
 const JAPAN_CENTER = [37.5, 137.5];
@@ -110,7 +111,7 @@ export default function MapView() {
   );
   const [activePrefecture, setActivePrefecture] = useState('All');
   const [user, setUser] = useState(null);
-  const [isSubscribed, setIsSubscribed] = useState(false);
+  const [isSubscribed, setIsSubscribed] = useState(!MEMBERSHIPS_ENABLED);
   const [showGate, setShowGate] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
@@ -135,7 +136,7 @@ export default function MapView() {
         if (currentUser.email === ADMIN_EMAIL) {
           setIsSubscribed(true);
         } else {
-          const sub = await getUserSubscription(currentUser.id);
+          const sub = MEMBERSHIPS_ENABLED ? await getUserSubscription(currentUser.id) : true;
           setIsSubscribed(!!sub);
         }
       }

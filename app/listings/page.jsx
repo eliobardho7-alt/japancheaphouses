@@ -5,6 +5,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { Lock, Filter, MapPin } from 'lucide-react';
 import { listings as staticListings } from '@/data/listings';
 import { supabase, getCurrentUser, getUserSubscription } from '@/lib/supabase';
+import { MEMBERSHIPS_ENABLED } from '@/lib/membership';
 
 import { ADMIN_EMAIL } from '@/lib/constants';
 
@@ -43,7 +44,7 @@ export default function ListingsPage() {
   const [showOnlyFree, setShowOnlyFree] = useState(false);
   const [activePrefecture, setActivePrefecture] = useState('All');
   const [allListings, setAllListings] = useState(staticListings.map(fromStatic));
-  const [isSubscribed, setIsSubscribed] = useState(false);
+  const [isSubscribed, setIsSubscribed] = useState(!MEMBERSHIPS_ENABLED);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -69,7 +70,7 @@ export default function ListingsPage() {
         if (user.email === ADMIN_EMAIL) {
           setIsSubscribed(true);
         } else {
-          const sub = await getUserSubscription(user.id);
+          const sub = MEMBERSHIPS_ENABLED ? await getUserSubscription(user.id) : true;
           setIsSubscribed(!!sub);
         }
       }
