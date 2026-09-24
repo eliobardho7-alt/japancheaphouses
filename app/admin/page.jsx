@@ -10,6 +10,7 @@ import {
   Mail,
   LogOut,
   TrendingUp,
+  Share2,
 } from 'lucide-react';
 import { getCurrentUser, signOut } from '@/lib/supabase';
 
@@ -139,6 +140,13 @@ export default function AdminDashboard() {
             <TrendingUp className="h-8 w-8 text-brand-accent mb-3" />
             <h3 className="font-serif text-lg text-brand mb-2">Metrics</h3>
             <p className="text-sm text-brand-gray mb-3">Activity feed, charts, and totals across all site events.</p>
+            <span className="text-sm text-brand-accent">Open →</span>
+          </Link>
+
+          <Link href="/admin/social" className="bg-white border border-brand-border p-6 card-hover block">
+            <Share2 className="h-8 w-8 text-brand-accent mb-3" />
+            <h3 className="font-serif text-lg text-brand mb-2">Social queue</h3>
+            <p className="text-sm text-brand-gray mb-3">Generate post images and captions from listings, then review before publishing.</p>
             <span className="text-sm text-brand-accent">Open →</span>
           </Link>
         </div>
