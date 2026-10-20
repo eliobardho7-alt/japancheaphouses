@@ -2,7 +2,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import { Calendar, Clock, ArrowLeft, Lock, ExternalLink } from 'lucide-react';
-import { getPostBySlug, blogPosts } from '@/data/blogs';
+import { loadPost, loadAllPosts } from '@/lib/blog';
 import { blogPostingJsonLd, breadcrumbList } from '@/lib/jsonld';
 import ViewGate from '@/components/ViewGate';
 import { getViewerAccess } from '@/lib/subscription';
@@ -13,7 +13,7 @@ export const dynamic = 'force-dynamic';
 
 export async function generateMetadata({ params }) {
   const { slug } = await params;
-  const post = getPostBySlug(slug);
+  const post = await loadPost(slug);
   if (!post) return {};
 
   const url = `/blog/${post.slug}`;
@@ -44,8 +44,9 @@ export async function generateMetadata({ params }) {
 
 export default async function BlogPostPage({ params }) {
   const { slug } = await params;
-  const post = getPostBySlug(slug);
+  const post = await loadPost(slug);
   if (!post) notFound();
+  const allPosts = await loadAllPosts();
 
   const { isSubscribed } = await getViewerAccess();
   const showFullContent = !post.isPremium || isSubscribed;
@@ -207,7 +208,7 @@ export default async function BlogPostPage({ params }) {
         <section className="mt-16 pt-12 border-t border-brand-border">
           <h2 className="font-serif text-2xl text-brand mb-6">More from Yama Vista</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {blogPosts
+            {allPosts
               .filter((p) => p.slug !== post.slug)
               .slice(0, 2)
               .map((related) => (
