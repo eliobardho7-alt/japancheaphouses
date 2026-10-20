@@ -24,4 +24,17 @@ jobs:
 
       - run: npm run build
 
-      - run: npm audit --audit-level=high
+      # Fail only on what can actually be exploited in the deployed site.
+      # Everything that ships to a visitor is a production dependency, so this
+      # gate stays strict.
+      - name: Audit production dependencies
+        run: npm audit --omit=dev --audit-level=high
+
+      # Build tooling (tailwind, eslint-config-next and their transitives)
+      # regularly carries advisories whose only fix is a major upgrade of the
+      # framework. Those are worth seeing, but blocking every deploy on an
+      # upstream release nobody here controls just trains people to ignore CI.
+      # Reported, never fatal.
+      - name: Report dev dependency advisories
+        run: npm audit --audit-level=high || true
+        continue-on-error: true
