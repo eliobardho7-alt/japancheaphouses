@@ -86,6 +86,12 @@ export async function POST(request) {
       to: email,
       subject: post.title,
       html: buildEmail({ post, siteUrl, unsubscribeUrl }),
+      // Mail is sent from a dedicated sending subdomain, which has no inbox —
+      // a reply there would bounce. Point replies at the address we do read.
+      replyTo:
+        process.env.ADMIN_EMAIL ||
+        process.env.NEXT_PUBLIC_CONTACT_EMAIL ||
+        undefined,
     });
 
     if (ok) sent++;
