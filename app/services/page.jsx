@@ -5,11 +5,12 @@ import { services } from '@/data/services';
 import { MEMBERSHIPS_ENABLED } from '@/lib/membership';
 
 export const metadata = {
-  title: 'Services — Japan Property Inspection, Management & Consulting',
+  title: 'Japan Property Inspection & Management Services',
   description:
     'Pre-purchase home inspection, property management, and free initial consultations for Japan real estate. Expert services for international investors buying akiya and houses in Japan.',
   alternates: { canonical: '/services' },
   openGraph: {
+    images: ['/og-image.png'],
     title: 'Services — Japan Cheap Houses',
     description: 'Inspection, management, and consulting for Japan real estate.',
     url: '/services',

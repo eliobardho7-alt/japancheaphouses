@@ -1,3 +1,7 @@
+// coverImage: set to null where the referenced file was never added to
+// public/. Every one of those paths returned 404, so the pages rendered a
+// broken image and shared with a broken social preview. Null makes the
+// existing placeholder render instead; set a real path once the photo exists.
 // Blog posts — Educational content, guides, and market analysis
 // Most blogs are FREE for everyone. Some can be marked premium.
 // You can edit these directly OR use the admin dashboard at /admin
@@ -13,7 +17,7 @@ export const blogPosts = [
     author: 'Elio Bardho',
     excerpt:
       "MOST PEOPLE DON'T LIKE TO TALK ABOUT THIS! Japan's real estate market has become increasingly attractive to foreign investors, but there are real risks you need to know.",
-    coverImage: '/blog/akiya-warning.jpg',
+    coverImage: null,
     isPremium: false,
     tags: ['akiya', 'investment', 'risks'],
     content: `
@@ -47,7 +51,7 @@ export const blogPosts = [
     author: 'Elio Bardho',
     excerpt:
       "Japan's real estate market is undergoing a major transformation in 2024 and 2025. New brokerage fee caps and renovation regulations will reshape the market.",
-    coverImage: '/blog/japan-laws.jpg',
+    coverImage: null,
     isPremium: false,
     tags: ['regulations', 'market-update', 'laws'],
     content: `
@@ -81,7 +85,7 @@ export const blogPosts = [
     author: 'Elio Bardho',
     excerpt:
       'Are you someone who is always on the lookout for unique and affordable real estate opportunities in Japan? Look no further than Yama-Vista.',
-    coverImage: '/blog/yama-vista-intro.jpg',
+    coverImage: null,
     isPremium: false,
     tags: ['introduction', 'about'],
     content: `
@@ -108,7 +112,7 @@ export const blogPosts = [
     author: 'Elio Bardho',
     excerpt:
       "Japan's capital offers unique investment opportunities that combine stability with potential for strong returns. Here's what you need to know.",
-    coverImage: '/blog/tokyo-investment.jpg',
+    coverImage: null,
     isPremium: true,
     tags: ['tokyo', 'investment', 'high-yield'],
     content: `

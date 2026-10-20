@@ -12,6 +12,8 @@ export default function robots() {
       },
     ],
     sitemap: `${SITE_URL}/sitemap.xml`,
+    // host: a Yandex-only directive Google ignores; it has to agree with the
+    // canonical host or it is just one more conflicting signal.
     host: SITE_URL,
   };
 }

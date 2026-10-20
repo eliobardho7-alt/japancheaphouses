@@ -1,3 +1,7 @@
+// coverImage: set to null where the referenced file was never added to
+// public/. Every one of those paths returned 404, so the pages rendered a
+// broken image and shared with a broken social preview. Null makes the
+// existing placeholder render instead; set a real path once the photo exists.
 // Real Estate Listings — Most are locked to premium subscribers
 // You can edit these directly OR use the admin dashboard at /admin
 // Listings are auto-loaded from Supabase if you connect it
@@ -18,7 +22,7 @@ export const listings = [
     date: '2025-02-18',
     excerpt:
       "It's insane to think that for the price of a used car, you can own a house with land in Japan! Perfect entry-level investment.",
-    coverImage: '/listings/minamisoma.jpg',
+    coverImage: null,
     isPremium: false, // FREE listing
     tags: ['akiya', 'fukushima', 'cheap-house'],
     content: `
@@ -50,7 +54,7 @@ export const listings = [
     date: '2025-02-04',
     excerpt:
       'Ever dreamed of waking up to ocean breezes and sunset views? This cozy 74㎡ home is just 5 minutes from the beach.',
-    coverImage: '/listings/wakayama-villa.jpg',
+    coverImage: null,
     isPremium: true,
     tags: ['wakayama', 'beachside', 'villa'],
     content: `
@@ -79,7 +83,7 @@ export const listings = [
     date: '2025-01-22',
     excerpt:
       'Japan never ceases to surprise me. A newly built house (2015) for only $19,000 with parking for 2 cars.',
-    coverImage: '/listings/miyazaki.jpg',
+    coverImage: null,
     isPremium: true,
     tags: ['miyazaki', 'newly-built', 'cheap'],
     content: `
@@ -108,7 +112,7 @@ export const listings = [
     date: '2024-11-14',
     excerpt:
       'Budget-friendly property in the Tokyo metropolitan area. Perfect for investors looking for proximity to Tokyo without the Tokyo price tag.',
-    coverImage: '/listings/kashiwa.jpg',
+    coverImage: null,
     isPremium: true,
     tags: ['chiba', 'tokyo-area', 'investment'],
     content: `
@@ -135,7 +139,7 @@ export const listings = [
     date: '2024-11-04',
     excerpt:
       'Incredible deal on this 2-story vacant house. Saitama offers great value compared to Tokyo with good commuting options.',
-    coverImage: '/listings/koshigaya.jpg',
+    coverImage: null,
     isPremium: true,
     tags: ['saitama', 'akiya', 'opportunity'],
     content: `

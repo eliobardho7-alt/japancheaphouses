@@ -4,6 +4,7 @@ export const metadata = {
     'Meet Elio Bardho, founder of Japan Cheap Houses. Helping international investors find affordable akiya and unique properties across Japan.',
   alternates: { canonical: '/about' },
   openGraph: {
+    images: ['/og-image.png'],
     title: 'About — Japan Cheap Houses',
     description: 'Meet the team behind Japan Cheap Houses and our mission.',
     url: '/about',

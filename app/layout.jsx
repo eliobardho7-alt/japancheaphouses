@@ -57,10 +57,10 @@ export const metadata = {
       'Find affordable Japanese homes and akiya. Expert consulting for international investors.',
     images: [
       {
-        url: '/logo.png',
+        url: '/og-image.png',
         width: 1200,
         height: 630,
-        alt: 'Japan Cheap Houses — Affordable Japanese Real Estate',
+        alt: 'Japan Cheap Houses — akiya and cheap houses in Japan',
       },
     ],
   },
@@ -69,7 +69,7 @@ export const metadata = {
     title: 'Japan Cheap Houses | Affordable Akiya & Real Estate in Japan',
     description:
       'Find affordable Japanese homes and akiya. Expert consulting for international investors.',
-    images: ['/logo.png'],
+    images: ['/og-image.png'],
   },
   robots: {
     index: true,

@@ -1,7 +1,7 @@
 export const metadata = {
-  title: 'Japan Property Listings — Akiya & Investment Homes',
+  title: 'Akiya & Cheap Houses for Sale in Japan',
   description:
-    'Curated property listings across Japan: akiya, detached houses, beachside villas, and city investment homes. Free entries plus premium listings for subscribers.',
+    'Curated listings across Japan: akiya, detached houses, beachside villas and city investment homes. Every price and detail is free to view.',
   alternates: { canonical: '/listings' },
 };
 

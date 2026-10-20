@@ -1,7 +1,7 @@
 export const metadata = {
-  title: 'Community — Members-only Japan real estate discussions',
+  title: 'Community — Japan Real Estate Discussions',
   description:
-    'Private member space for Yama Vista subscribers to discuss Japan real estate strategy, share leads, and ask questions of the community.',
+    'A free space to discuss Japan real estate strategy, share leads and ask questions. An account is all you need to post.',
   alternates: { canonical: '/community' },
   robots: { index: false, follow: false }, // gated content — don't index
 };

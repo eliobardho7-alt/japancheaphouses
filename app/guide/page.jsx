@@ -6,9 +6,10 @@ import { GUIDE } from '@/lib/guide';
 export const metadata = {
   title: "Free Guide: Buying a Home in Japan",
   description:
-    "A free 29-slide buyer's guide to purchasing property in Japan — what foreigners can legally own, the real acquisition costs, seismic codes, road access rules, and the six findings that should end a deal on the spot.",
+    "A free 29-slide guide to buying property in Japan: what foreigners can legally own, what it really costs, and the six findings that should end a deal.",
   alternates: { canonical: '/guide' },
   openGraph: {
+    images: ['/og-image.png'],
     title: "Free Guide: Buying a Home in Japan",
     description:
       "29 slides on what you can legally own, what it really costs, and the six findings that should end a deal on the spot.",
