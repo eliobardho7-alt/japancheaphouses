@@ -17,7 +17,9 @@ export async function GET() {
     supabase.from('bookings').select('id', { count: 'exact', head: true }),
     supabase.from('contact_submissions').select('id', { count: 'exact', head: true }),
     supabase.from('blog_posts').select('id', { count: 'exact', head: true }),
-    supabase.from('listings').select('id', { count: 'exact', head: true }),
+    // The 'listings' table has never existed; the real property data the
+    // site serves lives in scraped_listings.
+    supabase.from('scraped_listings').select('id', { count: 'exact', head: true }),
   ]);
 
   return NextResponse.json({

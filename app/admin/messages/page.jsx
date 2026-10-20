@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { ArrowLeft, Mail, MessageSquare } from 'lucide-react';
-import { supabase, getCurrentUser } from '@/lib/supabase';
+import { getCurrentUser } from '@/lib/supabase';
 
 import { ADMIN_EMAIL } from '@/lib/constants';
 
@@ -12,6 +12,7 @@ export default function AdminMessagesPage() {
   const router = useRouter();
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     checkAuth();
@@ -24,12 +25,23 @@ export default function AdminMessagesPage() {
       return;
     }
 
-    if (supabase) {
-      const { data } = await supabase
-        .from('contact_submissions')
-        .select('*')
-        .order('created_at', { ascending: false });
-      if (data) setMessages(data);
+    // Read through the admin API, not the browser client. contact_submissions
+    // is private data with no public select policy, so a query from the
+    // browser returns an empty list rather than an error — which is why the
+    // dashboard could count messages this page could not show.
+    try {
+      const res = await fetch('/api/admin/contact-submissions', { cache: 'no-store' });
+      if (res.ok) {
+        const data = await res.json();
+        setMessages(data.submissions || []);
+      } else if (res.status === 401 || res.status === 403) {
+        router.push('/login?redirect=/admin/messages');
+        return;
+      } else {
+        setError((await res.json()).error || `Could not load messages (${res.status})`);
+      }
+    } catch (e) {
+      setError(e.message);
     }
     setLoading(false);
   };
@@ -55,9 +67,9 @@ export default function AdminMessagesPage() {
 
         <h1 className="font-serif text-4xl text-brand mb-8">Contact Messages</h1>
 
-        {!supabase && (
-          <div className="bg-yellow-50 border border-yellow-200 p-4 mb-6 text-sm text-yellow-800">
-            ⚠️ Supabase is not configured yet. Messages are only sent via email. See README.md for setup.
+        {error && (
+          <div className="bg-red-50 border border-red-200 p-4 mb-6 text-sm text-red-800">
+            Could not load messages: {error}
           </div>
         )}
 

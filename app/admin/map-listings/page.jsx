@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import {
   Plus, Edit2, Trash2, ArrowLeft, Save, X, MapPin, Search,
 } from 'lucide-react';
-import { supabase, getCurrentUser } from '@/lib/supabase';
+import { getCurrentUser } from '@/lib/supabase';
 
 import { ADMIN_EMAIL } from '@/lib/constants';
 
@@ -53,13 +53,17 @@ export default function AdminMapListingsPage() {
     setLoading(false);
   };
 
+  // Goes through the admin API rather than the browser client: writes from
+  // the browser depend on a row-level policy for the signed-in role, while the
+  // API uses the service role and the same admin check as every other screen.
   const loadListings = async () => {
-    if (!supabase) return;
-    const { data } = await supabase
-      .from('scraped_listings')
-      .select('*')
-      .order('scraped_at', { ascending: false });
-    if (data) setListings(data);
+    const res = await fetch('/api/admin/map-listings', { cache: 'no-store' });
+    if (!res.ok) {
+      alert('Could not load listings: ' + ((await res.json()).error || res.status));
+      return;
+    }
+    const data = await res.json();
+    setListings(data.listings || []);
   };
 
   const emptyListing = {
@@ -80,31 +84,22 @@ export default function AdminMapListingsPage() {
   };
 
   const handleSave = async (listing) => {
-    if (!supabase) {
-      alert('Supabase not configured.');
-      return;
-    }
     const finalListing = {
       ...listing,
       source_url: listing.source_url || manualSourceUrl(listing.title),
     };
 
-    if (isCreating) {
-      const { error } = await supabase.from('scraped_listings').insert(finalListing);
-      if (error) {
-        alert('Save failed: ' + error.message);
-        return;
-      }
-    } else {
-      const { error } = await supabase
-        .from('scraped_listings')
-        .update(finalListing)
-        .eq('id', listing.id);
-      if (error) {
-        alert('Save failed: ' + error.message);
-        return;
-      }
+    const res = await fetch('/api/admin/map-listings', {
+      method: isCreating ? 'POST' : 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(finalListing),
+    });
+
+    if (!res.ok) {
+      alert('Save failed: ' + ((await res.json()).error || res.status));
+      return;
     }
+
     await loadListings();
     setEditing(null);
     setIsCreating(false);
@@ -112,7 +107,11 @@ export default function AdminMapListingsPage() {
 
   const handleDelete = async (id) => {
     if (!confirm('Delete this listing?')) return;
-    await supabase.from('scraped_listings').delete().eq('id', id);
+    const res = await fetch(`/api/admin/map-listings?id=${id}`, { method: 'DELETE' });
+    if (!res.ok) {
+      alert('Delete failed: ' + ((await res.json()).error || res.status));
+      return;
+    }
     await loadListings();
   };
 
