@@ -39,7 +39,7 @@ export default function PrivacyPage() {
             <ul className="list-disc list-inside space-y-2">
               <li>To respond to your inquiries and deliver the consultation, inspection, or property services you request.</li>
               <li>To send transactional emails (booking confirmations, account notifications) and, if you opt in, our newsletter.</li>
-              <li>To operate the membership and gate premium content for active subscribers.</li>
+              <li>To operate your account, if you create one to post in the community.</li>
               <li>To protect the service from abuse (rate limiting, anti-spam).</li>
             </ul>
 

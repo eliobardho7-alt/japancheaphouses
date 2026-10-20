@@ -6,6 +6,7 @@ import { listings, getListingBySlug } from '@/data/listings';
 import { realEstateListingJsonLd, breadcrumbList } from '@/lib/jsonld';
 import ViewGate from '@/components/ViewGate';
 import { getViewerAccess } from '@/lib/subscription';
+import { MEMBERSHIPS_ENABLED } from '@/lib/membership';
 
 // Premium gating reads the signed-in viewer's subscription from cookies, so
 // these pages must render per-request rather than being prerendered at build.
@@ -74,7 +75,7 @@ export default async function ListingDetailPage({ params }) {
         </Link>
 
         <header className="mb-8">
-          {listing.isPremium ? (
+          {MEMBERSHIPS_ENABLED && listing.isPremium ? (
             <span className="inline-flex items-center gap-1 text-xs text-white bg-brand-accent px-2 py-1 mb-3">
               <Lock className="h-3 w-3" />
               Premium Listing

@@ -103,8 +103,9 @@ export default function ListingsPage() {
               Property Listings
             </h1>
             <p className="text-brand-gray max-w-2xl">
-              Browse our full collection of unique and affordable properties across Japan.
-              Free visitors can see up to 5 detailed listings per day; subscribers unlock everything.
+              Browse our full collection of unique and affordable properties across
+              Japan — akiya, detached houses and investment homes. Every price and
+              detail is free to view, with no account and no limit.
             </p>
           </div>
 

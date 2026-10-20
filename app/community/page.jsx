@@ -105,8 +105,8 @@ function CommunityGate({ user }) {
                 },
                 {
                   icon: TrendingUp,
-                  title: 'Premium Listings',
-                  description: 'Access exclusive property listings before anyone else.',
+                  title: 'Every Listing',
+                  description: 'All prices and details, free and without a limit.',
                 },
               ].map((item, idx) => (
                 <div key={idx} className="text-center">
