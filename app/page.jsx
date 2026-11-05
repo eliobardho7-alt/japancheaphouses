@@ -2,12 +2,14 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { ArrowRight, Calendar, Home, Search } from 'lucide-react';
 import { services } from '@/data/services';
-import { getFeaturedPosts } from '@/data/blogs';
+import { loadAllPosts } from '@/lib/blog';
 import { listings } from '@/data/listings';
 import { MEMBERSHIPS_ENABLED } from '@/lib/membership';
 
-export default function HomePage() {
-  const featuredPosts = getFeaturedPosts(2);
+export default async function HomePage() {
+  // Newest posts first (database + static merged) — this section is titled
+  // "Latest from the Blog", so it must track what is actually newest.
+  const featuredPosts = (await loadAllPosts()).slice(0, 2);
   const featuredListings = listings.slice(0, 3);
 
   return (
@@ -153,9 +155,19 @@ export default function HomePage() {
                 className="bg-white border border-brand-border card-hover overflow-hidden"
               >
                 <div className="relative h-64 bg-gray-200">
-                  <div className="absolute inset-0 bg-gradient-to-br from-gray-300 to-gray-400 flex items-center justify-center">
-                    <Home className="h-16 w-16 text-white/50" />
-                  </div>
+                  {post.coverImage ? (
+                    <Image
+                      src={post.coverImage}
+                      alt={post.title}
+                      fill
+                      className="object-cover"
+                      sizes="(max-width: 768px) 100vw, 50vw"
+                    />
+                  ) : (
+                    <div className="absolute inset-0 bg-gradient-to-br from-gray-300 to-gray-400 flex items-center justify-center">
+                      <Home className="h-16 w-16 text-white/50" />
+                    </div>
+                  )}
                 </div>
                 <div className="p-6">
                   <span className="text-xs text-brand-accent uppercase tracking-wider">
