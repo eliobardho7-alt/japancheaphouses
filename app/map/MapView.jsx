@@ -9,6 +9,7 @@ import { Lock, MapPin, Filter, X } from 'lucide-react';
 import { listings as staticListings } from '@/data/listings';
 import { supabase, getCurrentUser, getUserSubscription } from '@/lib/supabase';
 import { MEMBERSHIPS_ENABLED } from '@/lib/membership';
+import { filterLiveCoversClient } from '@/lib/image-health';
 
 import { ADMIN_EMAIL } from '@/lib/constants';
 const JAPAN_CENTER = [37.5, 137.5];
@@ -126,7 +127,8 @@ export default function MapView() {
           .not('latitude', 'is', null)
           .not('longitude', 'is', null);
         if (data && data.length > 0) {
-          setAllListings((prev) => [...prev, ...data.map(normalizeScraped)]);
+          const live = await filterLiveCoversClient(data.map(normalizeScraped), (l) => l.coverImage);
+          setAllListings((prev) => [...prev, ...live]);
         }
       }
 

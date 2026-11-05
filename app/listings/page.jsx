@@ -6,6 +6,7 @@ import { Lock, Filter, MapPin } from 'lucide-react';
 import { listings as staticListings } from '@/data/listings';
 import { supabase, getCurrentUser, getUserSubscription } from '@/lib/supabase';
 import { MEMBERSHIPS_ENABLED } from '@/lib/membership';
+import { filterLiveCoversClient } from '@/lib/image-health';
 
 import { ADMIN_EMAIL } from '@/lib/constants';
 
@@ -57,10 +58,12 @@ export default function ListingsPage() {
           .eq('status', 'active')
           .order('scraped_at', { ascending: false });
         if (data && data.length > 0) {
-          setAllListings([
+          const combined = [
             ...staticListings.map(fromStatic),
             ...data.map(fromScraped),
-          ]);
+          ];
+          // Hide scraped listings whose hotlinked cover photo has died.
+          setAllListings(await filterLiveCoversClient(combined, (l) => l.coverImage));
         }
       }
 

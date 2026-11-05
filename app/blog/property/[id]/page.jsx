@@ -5,6 +5,7 @@ import {
   ArrowLeft, MapPin, Calendar, BookOpen, ExternalLink, Home,
 } from 'lucide-react';
 import ViewGate from '@/components/ViewGate';
+import { liveImages, isImageAlive } from '@/lib/image-health';
 import ViewCounter from '@/components/ViewCounter';
 
 export const dynamic = 'force-dynamic';
@@ -149,8 +150,22 @@ export default async function PropertyBlogPage({ params }) {
   const { id } = await params;
   const listing = await getListing(id);
   if (!listing) notFound();
+  // Hotlinked source photos rot over time; if none of this listing's
+  // images still load, the listing is effectively gone — 404 it.
+  const liveGallery = await liveImages([listing.cover_image_url, ...(listing.image_urls || [])]);
+  if (!liveGallery.length) notFound();
+  listing.cover_image_url = liveGallery[0];
+  listing.image_urls = liveGallery;
 
-  const related = await getRelated(listing);
+  const relatedRaw = await getRelated(listing);
+  const related = (
+    await Promise.all(
+      relatedRaw.map(async (r) =>
+        !r.cover_image_url || (await isImageAlive(r.cover_image_url)) ? r : null,
+      ),
+    )
+  ).filter(Boolean);
+
 
   const articleSchema = {
     '@context': 'https://schema.org',

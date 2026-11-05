@@ -2,6 +2,7 @@ import { blogPosts } from '@/data/blogs';
 import { listings } from '@/data/listings';
 import { getSiteUrl } from '@/lib/site-url';
 import { createClient } from '@supabase/supabase-js';
+import { listingHasLiveImages } from '@/lib/image-health';
 
 const SITE_URL = getSiteUrl();
 
@@ -57,11 +58,14 @@ export default async function sitemap() {
 
       const { data: scraped } = await db
         .from('scraped_listings')
-        .select('id, updated_at, blog_content, blog_published_at')
+        .select('id, updated_at, blog_content, blog_published_at, cover_image_url, image_urls')
         .eq('status', 'active')
         .limit(5000);
       if (scraped) {
-        scraped.forEach((l) => {
+        // Drop listings whose hotlinked photos have all died.
+        const liveFlags = await Promise.all(scraped.map((l) => listingHasLiveImages(l)));
+        scraped.forEach((l, idx) => {
+          if (!liveFlags[idx]) return;
           scrapedRoutes.push({
             url: `${SITE_URL}/map/listing/${l.id}`,
             lastModified: new Date(l.updated_at || Date.now()),
