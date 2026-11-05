@@ -47,7 +47,7 @@ export async function POST(request) {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          from: `Yama Vista <${sanitizeHeader(fromAddress)}>`,
+          from: `Japan Cheap Houses <${sanitizeHeader(fromAddress)}>`,
           to: [sanitizeHeader(adminEmail)],
           reply_to: sanitizeHeader(email),
           subject: sanitizeHeader(`New Contact: ${subject || 'No subject'} — from ${name}`),

@@ -70,7 +70,7 @@ export async function POST(request) {
     subject: `Your copy of ${GUIDE.title}`,
     html: `<div style="font-family:sans-serif;max-width:600px;margin:auto;color:#1a1a1a;">
   <div style="background:#1a1a1a;padding:24px 32px;margin-bottom:32px;">
-    <h2 style="color:#fff;margin:0;font-size:20px;">Yama Vista</h2>
+    <h2 style="color:#fff;margin:0;font-size:20px;">Japan Cheap Houses</h2>
   </div>
   <div style="padding:0 32px 32px;">
     <p style="margin-top:0;">Thanks for subscribing. Here is your copy of
@@ -86,7 +86,7 @@ export async function POST(request) {
       <a href="${getSiteUrl()}/guide" style="color:#6b7280;">${getSiteUrl()}/guide</a>.</p>
     <hr style="border:none;border-top:1px solid #e5e7eb;margin:32px 0 16px;" />
     <p style="color:#9ca3af;font-size:12px;margin:0;">You are receiving this
-      because you subscribed to the Yama Vista newsletter at japancheaphouses.com.</p>
+      because you subscribed to the Japan Cheap Houses newsletter at japancheaphouses.com.</p>
   </div>
 </div>`,
   });

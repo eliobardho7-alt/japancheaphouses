@@ -136,7 +136,7 @@ export default function GuideSignup({ compact = false, onSuccess }) {
       </button>
 
       <p className="text-xs text-brand-gray mt-4">
-        Submitting subscribes you to the Yama Vista newsletter — listings, market notes and
+        Submitting subscribes you to the Japan Cheap Houses newsletter — listings, market notes and
         buying advice. Unsubscribe any time. We never sell your address.
       </p>
     </form>

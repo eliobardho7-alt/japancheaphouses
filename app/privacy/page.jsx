@@ -3,7 +3,7 @@ import Link from 'next/link';
 export const metadata = {
   title: 'Privacy Policy',
   description:
-    'How Yama Vista collects, uses, and protects information from visitors and customers.',
+    'How Japan Cheap Houses collects, uses, and protects information from visitors and customers.',
   alternates: { canonical: '/privacy' },
   robots: { index: true, follow: true },
 };
@@ -22,7 +22,7 @@ export default function PrivacyPage() {
 
           <div className="prose prose-neutral max-w-none text-brand-gray space-y-6 leading-relaxed">
             <p>
-              Yama Vista (&ldquo;we&rdquo;, &ldquo;us&rdquo;) operates this site and provides real estate consulting services. This policy explains what information we collect, how we use it, and the choices you have.
+              Japan Cheap Houses (&ldquo;we&rdquo;, &ldquo;us&rdquo;) operates this site and provides real estate consulting services. This policy explains what information we collect, how we use it, and the choices you have.
             </p>
 
             <h2 className="font-serif text-2xl text-brand mt-10 mb-3">Information we collect</h2>

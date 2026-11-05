@@ -47,11 +47,11 @@ export async function GET(request) {
 
   // Plain HTML: this is opened from a mail client, often logged out.
   const body = result.ok
-    ? `<h1>You're unsubscribed</h1><p>We've removed your address from the Yama Vista newsletter. You won't receive further emails from us.</p><p>Changed your mind? You can sign up again any time at <a href="${site}/guide">${site.replace(/^https?:\/\//, '')}/guide</a>.</p>`
+    ? `<h1>You're unsubscribed</h1><p>We've removed your address from the Japan Cheap Houses newsletter. You won't receive further emails from us.</p><p>Changed your mind? You can sign up again any time at <a href="${site}/guide">${site.replace(/^https?:\/\//, '')}/guide</a>.</p>`
     : `<h1>We couldn't unsubscribe you</h1><p>${result.message}</p><p>Email us and we'll remove you by hand.</p>`;
 
   return new NextResponse(
-    `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><title>Unsubscribe — Yama Vista</title><style>body{font-family:system-ui,sans-serif;max-width:34rem;margin:12vh auto;padding:0 1.5rem;color:#1a1a1a;line-height:1.6}h1{font-size:1.6rem;margin-bottom:1rem}a{color:#8B0000}</style></head><body>${body}</body></html>`,
+    `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><title>Unsubscribe — Japan Cheap Houses</title><style>body{font-family:system-ui,sans-serif;max-width:34rem;margin:12vh auto;padding:0 1.5rem;color:#1a1a1a;line-height:1.6}h1{font-size:1.6rem;margin-bottom:1rem}a{color:#8B0000}</style></head><body>${body}</body></html>`,
     { status: result.status, headers: { 'Content-Type': 'text/html; charset=utf-8' } }
   );
 }

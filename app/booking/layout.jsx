@@ -1,7 +1,7 @@
 export const metadata = {
   title: 'Book a Free Consultation',
   description:
-    'Schedule a free 45-minute consultation with Yama Vista to discuss your Japan real estate goals, akiya plans, or property management needs.',
+    'Schedule a free 45-minute consultation with Japan Cheap Houses to discuss your Japan real estate goals, akiya plans, or property management needs.',
   alternates: { canonical: '/booking' },
 };
 

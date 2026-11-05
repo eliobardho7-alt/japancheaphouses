@@ -94,7 +94,6 @@ const organizationJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'Organization',
   name: 'Japan Cheap Houses',
-  alternateName: 'Yama Vista',
   url: SITE_URL,
   logo: `${SITE_URL}/logo.png`,
   description:

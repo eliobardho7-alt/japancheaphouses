@@ -105,7 +105,7 @@ function LoginForm() {
           </form>
 
           <p className="text-sm text-brand-gray text-center mt-6">
-            New to Yama Vista?{' '}
+            New to Japan Cheap Houses?{' '}
             <Link href="/signup" className="text-brand-accent hover:underline">
               Create an account
             </Link>

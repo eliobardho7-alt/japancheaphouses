@@ -115,7 +115,7 @@ export default function AdminMessagesPage() {
 
                 <div className="mt-4">
                   <a
-                    href={`mailto:${msg.email}?subject=Re: ${msg.subject || 'Your message to Yama Vista'}`}
+                    href={`mailto:${msg.email}?subject=Re: ${msg.subject || 'Your message to Japan Cheap Houses'}`}
                     className="text-sm text-brand-accent hover:underline inline-flex items-center gap-1"
                   >
                     <Mail className="h-3 w-3" />
