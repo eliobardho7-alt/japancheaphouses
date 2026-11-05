@@ -3,14 +3,76 @@ import Image from 'next/image';
 import { ArrowRight, Calendar, Home, Search } from 'lucide-react';
 import { services } from '@/data/services';
 import { loadAllPosts } from '@/lib/blog';
+import { createClient } from '@supabase/supabase-js';
+import { isImageAlive } from '@/lib/image-health';
 import { listings } from '@/data/listings';
 import { MEMBERSHIPS_ENABLED } from '@/lib/membership';
+
+
+// Featured listings: real scraped properties with photos that still load
+// (the hand-written static listings have no photos at all, which left this
+// section showing placeholder art). Falls back to the static entries.
+const FEATURED_IDS = [48, 11, 66]; // Akita station 6DK, Hachinohe 4DK, Akita 9DK garden house
+
+async function loadFeaturedListings() {
+  const fallback = listings.slice(0, 3).map((l) => ({
+    key: `static-${l.id}`,
+    href: `/listings/${l.slug}`,
+    title: l.title,
+    location: l.location,
+    price: l.price,
+    coverImage: null,
+    isPremium: !!l.isPremium,
+  }));
+  try {
+    const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+    if (!url || !key) return fallback;
+    const db = createClient(url, key);
+    const shape = (r) => ({
+      key: `scraped-${r.id}`,
+      href: `/map/listing/${r.id}`,
+      title: r.title,
+      location: r.address_english,
+      price: r.price_jpy ? `¥${r.price_jpy.toLocaleString('en-US')}` : '—',
+      coverImage: r.cover_image_url || null,
+      isPremium: false,
+    });
+    const { data: picked } = await db
+      .from('scraped_listings')
+      .select('id, title, address_english, price_jpy, cover_image_url')
+      .eq('status', 'active')
+      .in('id', FEATURED_IDS);
+    const byId = new Map((picked || []).map((r) => [r.id, r]));
+    let rows = FEATURED_IDS.map((id) => byId.get(id)).filter(Boolean);
+    if (rows.length < 3) {
+      const { data: cheap } = await db
+        .from('scraped_listings')
+        .select('id, title, address_english, price_jpy, cover_image_url')
+        .eq('status', 'active')
+        .order('price_jpy', { ascending: true })
+        .limit(8);
+      for (const r of cheap || []) {
+        if (rows.length >= 3) break;
+        if (!rows.some((x) => x.id === r.id)) rows.push(r);
+      }
+    }
+    const live = [];
+    for (const r of rows) {
+      if (r.cover_image_url && (await isImageAlive(r.cover_image_url))) live.push(shape(r));
+      if (live.length >= 3) break;
+    }
+    return live.length ? live : fallback;
+  } catch {
+    return fallback;
+  }
+}
 
 export default async function HomePage() {
   // Newest posts first (database + static merged) — this section is titled
   // "Latest from the Blog", so it must track what is actually newest.
   const featuredPosts = (await loadAllPosts()).slice(0, 2);
-  const featuredListings = listings.slice(0, 3);
+  const featuredListings = await loadFeaturedListings();
 
   return (
     <>
@@ -207,11 +269,20 @@ export default async function HomePage() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {featuredListings.map((listing) => (
               <Link
-                key={listing.id}
-                href={`/listings/${listing.slug}`}
+                key={listing.key}
+                href={listing.href}
                 className="bg-white border border-brand-border card-hover overflow-hidden group block"
               >
                 <div className="relative aspect-[4/3] bg-gradient-to-br from-gray-200 to-gray-300">
+                  {listing.coverImage && (
+                    <Image
+                      src={listing.coverImage}
+                      alt={listing.title}
+                      fill
+                      className="object-cover"
+                      sizes="(max-width: 768px) 100vw, 33vw"
+                    />
+                  )}
                   {MEMBERSHIPS_ENABLED &&
                     (listing.isPremium ? (
                       <div className="absolute top-3 right-3 bg-brand-accent text-white px-2 py-1 text-xs">
@@ -222,9 +293,11 @@ export default async function HomePage() {
                         Free
                       </div>
                     ))}
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <span className="text-5xl opacity-30">🏡</span>
-                  </div>
+                  {!listing.coverImage && (
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <span className="text-5xl opacity-30">🏡</span>
+                    </div>
+                  )}
                   <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-3">
                     <div className="text-white font-serif">{listing.price}</div>
                   </div>
