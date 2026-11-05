@@ -208,7 +208,7 @@ function PostCard({ post, onUpdate }) {
           <div className="flex gap-3 mt-2">
             <a
               href={cardSrc}
-              download={`yamavista-${post.listing_id}-${post.format}.png`}
+              download={`japancheaphouses-${post.listing_id}-${post.format}.png`}
               className="inline-flex items-center gap-1 text-xs text-brand-gray hover:text-brand"
             >
               <Download className="h-3 w-3" />

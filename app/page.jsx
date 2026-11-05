@@ -30,12 +30,12 @@ export default function HomePage() {
         <div className="container-custom relative z-10">
           <div className="max-w-2xl animate-fade-up">
             <h1 className="font-serif text-5xl md:text-7xl text-white leading-tight mb-6">
-              EXPLORE UNIQUE
+              CHEAP HOUSES &amp; AKIYA
               <br />
-              PROPERTIES
+              IN JAPAN
             </h1>
             <p className="text-white/90 text-lg mb-8 max-w-xl">
-              Discover a world of affordable and rare properties in Japan with Yama Vista.
+              Discover a world of affordable and rare properties in Japan with Japan Cheap Houses.
             </p>
             <div className="flex flex-wrap gap-4">
               <Link href="/listings" className="btn-primary bg-white text-brand hover:bg-brand-light">
@@ -54,10 +54,10 @@ export default function HomePage() {
         <div className="container-custom grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
           <div>
             <h2 className="font-serif text-4xl md:text-5xl text-brand mb-6">
-              About Yama Vista
+              About Japan Cheap Houses
             </h2>
             <p className="text-brand-gray mb-4 leading-relaxed">
-              Hi, I'm Elio. After living in Japan for three years and working in both marketing and real estate, I created Yama Vista to help people like you find and invest in their dream home in Japan.
+              Hi, I'm Elio. After living in Japan for three years and working in both marketing and real estate, I created Japan Cheap Houses to help people like you find and invest in their dream home in Japan.
             </p>
             <p className="text-brand-gray mb-6 leading-relaxed">
               I personally own three properties and have helped countless people navigate Japan's unique real estate market—from inspections to renovations to property management. Japan's market has incredible opportunities, but there are nuances and things you need to know to succeed. That's where we come in.
@@ -81,7 +81,7 @@ export default function HomePage() {
             <div className="w-72 h-72 rounded-full overflow-hidden border-4 border-brand shadow-lg">
               <Image
                 src="/elio-profile.jpg"
-                alt="Elio Bardho, Founder of Yama Vista"
+                alt="Elio Bardho, Founder of Japan Cheap Houses"
                 width={288}
                 height={288}
                 className="w-full h-full object-cover"
@@ -234,7 +234,7 @@ export default function HomePage() {
         <div className="container-custom">
           <div className="text-center mb-12">
             <h2 className="font-serif text-4xl md:text-5xl text-brand mb-4">
-              Why Choose Yama Vista
+              Why Choose Japan Cheap Houses
             </h2>
             <p className="text-brand-gray max-w-2xl mx-auto">
               We bring transparency, local expertise, and a curated approach to Japan real estate.

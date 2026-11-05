@@ -3,7 +3,7 @@ import Link from 'next/link';
 export const metadata = {
   title: 'Terms of Service',
   description:
-    'The terms that govern your use of Yama Vista and the services we offer.',
+    'The terms that govern your use of Japan Cheap Houses and the services we offer.',
   alternates: { canonical: '/terms' },
   robots: { index: true, follow: true },
 };
@@ -22,12 +22,12 @@ export default function TermsPage() {
 
           <div className="prose prose-neutral max-w-none text-brand-gray space-y-6 leading-relaxed">
             <p>
-              By using Yama Vista (the &ldquo;Service&rdquo;) you agree to these Terms. Please read them carefully. If you do not agree, do not use the Service.
+              By using Japan Cheap Houses (the &ldquo;Service&rdquo;) you agree to these Terms. Please read them carefully. If you do not agree, do not use the Service.
             </p>
 
             <h2 className="font-serif text-2xl text-brand mt-10 mb-3">Who we are</h2>
             <p>
-              Yama Vista is an independent real estate consulting service operated by Elio Bardho, based in Japan, that helps international buyers research, evaluate, purchase, renovate, and manage Japanese property.
+              Japan Cheap Houses is an independent real estate consulting service operated by Elio Bardho, based in Japan, that helps international buyers research, evaluate, purchase, renovate, and manage Japanese property.
             </p>
 
             <h2 className="font-serif text-2xl text-brand mt-10 mb-3">Accounts</h2>
@@ -61,12 +61,12 @@ export default function TermsPage() {
 
             <h2 className="font-serif text-2xl text-brand mt-10 mb-3">Intellectual property</h2>
             <p>
-              The Yama Vista name, logo, site design, written content, and curated listings belong to us. You may share short excerpts with attribution and a link back, but you may not reproduce the content in full.
+              The Japan Cheap Houses name, logo, site design, written content, and curated listings belong to us. You may share short excerpts with attribution and a link back, but you may not reproduce the content in full.
             </p>
 
             <h2 className="font-serif text-2xl text-brand mt-10 mb-3">No warranty; limitation of liability</h2>
             <p>
-              The Service is provided &ldquo;as is&rdquo; without warranties of any kind. To the maximum extent permitted by law, Yama Vista is not liable for any indirect, incidental, special, or consequential damages arising from your use of the Service. Our total liability is limited to the amount you paid us in the twelve months before the claim.
+              The Service is provided &ldquo;as is&rdquo; without warranties of any kind. To the maximum extent permitted by law, Japan Cheap Houses is not liable for any indirect, incidental, special, or consequential damages arising from your use of the Service. Our total liability is limited to the amount you paid us in the twelve months before the claim.
             </p>
 
             <h2 className="font-serif text-2xl text-brand mt-10 mb-3">Termination</h2>

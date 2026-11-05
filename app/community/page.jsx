@@ -53,7 +53,7 @@ function CommunityGate({ user }) {
           <div className="text-center mb-16">
             <Lock className="h-12 w-12 text-brand-accent mx-auto mb-4" />
             <h1 className="font-serif text-4xl md:text-5xl text-brand mb-4">
-              Join the Yama Vista Community
+              Join the Japan Cheap Houses Community
             </h1>
             <p className="text-brand-gray max-w-2xl mx-auto mb-8">
               Connect with fellow real estate enthusiasts, get advice from

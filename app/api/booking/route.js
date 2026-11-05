@@ -61,7 +61,7 @@ export async function POST(request) {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          from: `Yama Vista <${sanitizeHeader(fromAddress)}>`,
+          from: `Japan Cheap Houses <${sanitizeHeader(fromAddress)}>`,
           to: [sanitizeHeader(adminEmail)],
           reply_to: sanitizeHeader(email),
           subject: sanitizeHeader(`New Booking: ${serviceName} - ${formattedDate}`),
@@ -96,14 +96,14 @@ export async function POST(request) {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            from: `Yama Vista <${sanitizeHeader(process.env.RESEND_FROM_EMAIL)}>`,
+            from: `Japan Cheap Houses <${sanitizeHeader(process.env.RESEND_FROM_EMAIL)}>`,
             to: [sanitizeHeader(email)],
             reply_to: sanitizeHeader(adminEmail),
             subject: sanitizeHeader(`Booking Confirmed: ${serviceName}`),
             html: `
 <div style="font-family: sans-serif; max-width: 600px; margin: auto;">
   <h2 style="color: #1a1a1a;">Hi ${safeName}, your booking is confirmed!</h2>
-  <p>Thank you for booking with Yama Vista. Here are your appointment details:</p>
+  <p>Thank you for booking with Japan Cheap Houses. Here are your appointment details:</p>
   <div style="background: #f8f7f4; padding: 20px; margin: 20px 0;">
     <p><strong>Service:</strong> ${safeService}</p>
     <p><strong>Date:</strong> ${safeDate}</p>
@@ -111,7 +111,7 @@ export async function POST(request) {
   </div>
   <p>We will reach out to you shortly with meeting details.</p>
   <p>If you need to reschedule, just reply to this email.</p>
-  <p><strong>Elio Bardho</strong><br />Yama Vista</p>
+  <p><strong>Elio Bardho</strong><br />Japan Cheap Houses</p>
 </div>`,
           }),
         });

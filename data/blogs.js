@@ -78,19 +78,19 @@ export const blogPosts = [
   {
     id: 3,
     slug: 'discover-unique-japan-real-estate-yama-vista',
-    title: 'Discover Unique Japan Real Estate with Yama Vista',
+    title: 'Discover Unique Japan Real Estate with Japan Cheap Houses',
     category: 'Guides',
     date: '2024-10-22',
     readTime: '1 min read',
     author: 'Elio Bardho',
     excerpt:
-      'Are you someone who is always on the lookout for unique and affordable real estate opportunities in Japan? Look no further than Yama-Vista.',
+      'Are you someone who is always on the lookout for unique and affordable real estate opportunities in Japan? Look no further than Japan-Cheap-Houses.',
     coverImage: null,
     isPremium: false,
     tags: ['introduction', 'about'],
     content: `
       Are you someone who is always on the lookout for unique and affordable real estate
-      opportunities in Japan? Look no further than Yama-Vista.
+      opportunities in Japan? Look no further than Japan-Cheap-Houses.
 
       ## What We Offer
 

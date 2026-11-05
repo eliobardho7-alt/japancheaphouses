@@ -40,7 +40,7 @@ export default function Footer() {
           <div className="lg:col-span-1">
             <Image
               src="/logo.png"
-              alt="Yama Vista"
+              alt="Japan Cheap Houses"
               width={120}
               height={120}
               className="h-24 w-auto mb-4"
@@ -151,7 +151,7 @@ export default function Footer() {
         {/* Bottom Bar */}
         <div className="mt-12 pt-8 border-t border-brand-border flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-xs text-brand-gray">
-            © {CURRENT_YEAR} Yama Vista Real Estate Consulting. All rights reserved.
+            © {CURRENT_YEAR} Japan Cheap Houses. All rights reserved.
           </p>
           <div className="flex space-x-6">
             <Link

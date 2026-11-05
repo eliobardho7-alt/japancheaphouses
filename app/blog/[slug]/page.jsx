@@ -206,7 +206,7 @@ export default async function BlogPostPage({ params }) {
         )}
 
         <section className="mt-16 pt-12 border-t border-brand-border">
-          <h2 className="font-serif text-2xl text-brand mb-6">More from Yama Vista</h2>
+          <h2 className="font-serif text-2xl text-brand mb-6">More from Japan Cheap Houses</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {allPosts
               .filter((p) => p.slug !== post.slug)

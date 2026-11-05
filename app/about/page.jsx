@@ -5,7 +5,7 @@ import { CheckCircle, Users, Target, Heart } from 'lucide-react';
 export const metadata = {
   title: 'About — A boutique consultancy for Japan real estate',
   description:
-    "Meet Elio Bardho, founder of Yama Vista. Three years on the ground in Japan helping international buyers navigate akiya purchases, renovations, and property management.",
+    "Meet Elio Bardho, founder of Japan Cheap Houses. Three years on the ground in Japan helping international buyers navigate akiya purchases, renovations, and property management.",
   alternates: { canonical: '/about' },
 };
 
@@ -17,7 +17,7 @@ export default function AboutPage() {
         <div className="container-custom">
           <div className="max-w-3xl">
             <h1 className="font-serif text-5xl md:text-6xl text-brand mb-6">
-              About Yama Vista
+              About Japan Cheap Houses
             </h1>
             <p className="text-lg text-brand-gray leading-relaxed">
               We help international buyers navigate Japan&apos;s real estate market — from akiya hunting and inspections to renovations and ongoing property management.
@@ -36,7 +36,7 @@ export default function AboutPage() {
                 Hey, my name is Elio. I&apos;ve been living in Japan for about three years, and I&apos;ve worked with different companies in marketing and the real estate industry, assisting people with buying, managing, and renovating homes in Japan.
               </p>
               <p className="text-brand-gray mb-4 leading-relaxed">
-                I personally own three properties in Japan, and I created Yama Vista to help those who live abroad and would like to purchase their dream home here. I assist with renovations and answer any questions throughout the entire process.
+                I personally own three properties in Japan, and I created Japan Cheap Houses to help those who live abroad and would like to purchase their dream home here. I assist with renovations and answer any questions throughout the entire process.
               </p>
               <p className="text-brand-gray mb-4 leading-relaxed">
                 There are a lot of nuances in Japan&apos;s real estate market that outside buyers don&apos;t see — things that can make or break a deal. That&apos;s where we come in.
@@ -49,7 +49,7 @@ export default function AboutPage() {
               <div className="w-64 h-64 rounded-full overflow-hidden border-4 border-brand shadow-lg">
                 <Image
                   src="/elio-profile.jpg"
-                  alt="Elio Bardho, Founder of Yama Vista"
+                  alt="Elio Bardho, Founder of Japan Cheap Houses"
                   width={256}
                   height={256}
                   className="w-full h-full object-cover"

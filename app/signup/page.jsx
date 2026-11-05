@@ -68,7 +68,7 @@ export default function SignupPage() {
         <div className="max-w-md mx-auto bg-white border border-brand-border p-8 md:p-12">
           <div className="text-center mb-8">
             <h1 className="font-serif text-3xl text-brand mb-2">Create an Account</h1>
-            <p className="text-sm text-brand-gray">Join Yama Vista and start exploring properties.</p>
+            <p className="text-sm text-brand-gray">Join Japan Cheap Houses and start exploring properties.</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-5">
