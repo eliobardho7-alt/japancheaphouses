@@ -42,6 +42,30 @@ export async function generateMetadata({ params }) {
   };
 }
 
+
+// Minimal inline formatting for post bodies: **bold** and [label](/path)
+// links (internal links use next/link; external open in a new tab).
+function renderInline(text) {
+  const parts = text.split(/(\*\*[^*]+\*\*|\[[^\]]+\]\([^)]+\))/g);
+  return parts.map((part, i) => {
+    const bold = part.match(/^\*\*([^*]+)\*\*$/);
+    if (bold) return <strong key={i}>{bold[1]}</strong>;
+    const link = part.match(/^\[([^\]]+)\]\(([^)]+)\)$/);
+    if (link) {
+      return link[2].startsWith('/') ? (
+        <Link key={i} href={link[2]} className="text-brand-accent underline">
+          {link[1]}
+        </Link>
+      ) : (
+        <a key={i} href={link[2]} target="_blank" rel="noopener noreferrer" className="text-brand-accent underline">
+          {link[1]}
+        </a>
+      );
+    }
+    return part;
+  });
+}
+
 export default async function BlogPostPage({ params }) {
   const { slug } = await params;
   const post = await loadPost(slug);
@@ -149,13 +173,13 @@ export default async function BlogPostPage({ params }) {
                 if (trimmed.startsWith('- ') || trimmed.match(/^\d+\./)) {
                   return (
                     <p key={idx} className="ml-4 mb-2">
-                      {trimmed}
+                      {renderInline(trimmed)}
                     </p>
                   );
                 }
                 return (
                   <p key={idx} className="mb-4">
-                    {trimmed}
+                    {renderInline(trimmed)}
                   </p>
                 );
               })}
