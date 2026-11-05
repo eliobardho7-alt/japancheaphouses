@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Lock, MessageCircle, Users, TrendingUp, Plus, X, Send } from 'lucide-react';
+import { Lock, MessageCircle, Users, TrendingUp, Plus, X, Send, Instagram } from 'lucide-react';
 import { communityCategories } from '@/data/community';
 import { supabase, getCurrentUser, getUserSubscription } from '@/lib/supabase';
 import { MEMBERSHIPS_ENABLED } from '@/lib/membership';
@@ -206,6 +206,42 @@ function CommunityDashboard({ user }) {
             <p className="text-brand-gray">
               Discuss real estate, share experiences, and connect with members.
             </p>
+
+            {/* Pinned announcement: follow the brand on social media */}
+            <div className="mt-8 border border-brand-border bg-brand-light/40 p-5 flex flex-col md:flex-row md:items-center gap-4 text-left">
+              <div className="flex-grow">
+                <p className="text-xs uppercase tracking-wide text-brand-accent mb-1">
+                  📣 From the Japan Cheap Houses team
+                </p>
+                <h2 className="font-serif text-xl text-brand mb-1">
+                  We're now on Instagram &amp; TikTok!
+                </h2>
+                <p className="text-sm text-brand-gray">
+                  We post new cheap houses and akiya as short videos — house tours, price
+                  reveals and buying tips for foreign buyers. Follow{' '}
+                  <strong>@japancheaphouses</strong> so you never miss a listing.
+                </p>
+              </div>
+              <div className="flex gap-3 shrink-0">
+                <a
+                  href="https://www.instagram.com/japancheaphouses/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn-primary flex items-center gap-2 text-sm"
+                >
+                  <Instagram className="h-4 w-4" />
+                  Instagram
+                </a>
+                <a
+                  href="https://www.tiktok.com/@japancheaphouses"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn-secondary flex items-center gap-2 text-sm"
+                >
+                  TikTok
+                </a>
+              </div>
+            </div>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
