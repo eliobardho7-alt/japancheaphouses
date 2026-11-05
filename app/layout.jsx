@@ -83,9 +83,9 @@ export const metadata = {
     },
   },
   icons: {
-    icon: '/logo.png',
-    shortcut: '/logo.png',
-    apple: '/logo.png',
+    icon: '/logo.svg',
+    shortcut: '/logo.svg',
+    apple: '/logo.svg',
   },
   category: 'Real Estate',
 };
@@ -95,7 +95,7 @@ const organizationJsonLd = {
   '@type': 'Organization',
   name: 'Japan Cheap Houses',
   url: SITE_URL,
-  logo: `${SITE_URL}/logo.png`,
+  logo: `${SITE_URL}/logo.svg`,
   description:
     'Affordable Japanese real estate and akiya consulting for international investors.',
   founder: { '@type': 'Person', name: 'Elio Bardho' },

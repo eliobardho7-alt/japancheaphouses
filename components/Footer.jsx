@@ -39,7 +39,7 @@ export default function Footer() {
           {/* Logo & About */}
           <div className="lg:col-span-1">
             <Image
-              src="/logo.png"
+              src="/logo.svg"
               alt="Japan Cheap Houses"
               width={120}
               height={120}

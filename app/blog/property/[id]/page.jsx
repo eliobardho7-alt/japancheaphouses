@@ -162,7 +162,7 @@ export default async function PropertyBlogPage({ params }) {
     publisher: {
       '@type': 'Organization',
       name: 'Japan Cheap Houses',
-      logo: { '@type': 'ImageObject', url: 'https://www.japancheaphouses.com/logo.png' },
+      logo: { '@type': 'ImageObject', url: 'https://www.japancheaphouses.com/logo.svg' },
     },
     mainEntityOfPage: {
       '@type': 'WebPage',

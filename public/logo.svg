@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 1200">
+  <rect width="1200" height="1200" fill="#ffffff"/>
+  <!-- rising sun -->
+  <circle cx="597" cy="382" r="53" fill="#b3273a"/>
+  <!-- abstract mountain / torii bars -->
+  <rect x="430" y="300" width="38" height="300" fill="#1a1a1a"/>
+  <rect x="578" y="235" width="44" height="365" fill="#1a1a1a"/>
+  <rect x="726" y="300" width="38" height="300" fill="#1a1a1a"/>
+  <rect x="430" y="566" width="334" height="34" fill="#1a1a1a"/>
+  <!-- Mt Fuji silhouette -->
+  <polygon points="398,600 597,408 796,600" fill="#1a1a1a"/>
+  <!-- snowcap -->
+  <polygon points="597,408 566,462 582,450 597,474 613,452 628,464" fill="#ffffff"/>
+  <!-- wordmark -->
+  <text x="600" y="753" text-anchor="middle" font-family="'Helvetica Neue', Arial, sans-serif" font-size="63" letter-spacing="13" fill="#1a1a1a">JAPAN CHEAP HOUSES</text>
+  <text x="600" y="828" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="33" letter-spacing="9" fill="#5a5a5a">Real Estate Consulting</text>
+</svg>

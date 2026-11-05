@@ -47,7 +47,7 @@ export default function Navbar() {
         <div className="flex items-center justify-between h-20">
           <Link href="/" className="flex items-center" aria-label="Japan Cheap Houses home">
             <Image
-              src="/logo.png"
+              src="/logo.svg"
               alt="Japan Cheap Houses"
               width={70}
               height={70}
