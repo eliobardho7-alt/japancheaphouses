@@ -151,7 +151,7 @@ export const blogPosts = [
 
       Most foreign buyers fall into one of three groups: people relocating to Japan, investors looking for affordable rental property, and buyers hunting [akiya — Japan's vacant houses](/blog/akiya-japan-empty-houses-guide) for a second home or renovation project. Your group decides your budget, your location, and how much condition risk you should accept.
 
-      Prices vary enormously by region. A detached house in central Tokyo can cost more than a house in New York, while structurally sound homes in regional cities like Akita and Hachinohe regularly list between ¥1.5 million and ¥3 million (roughly $10,000–$20,000). Our breakdown of the [cheapest places to buy a house in Japan](/blog/cheapest-places-to-buy-a-house-in-japan-2026) shows real current examples.
+      Prices vary enormously by region. A detached house in central Tokyo can cost as much as one in New York or London, while structurally sound homes in regional cities like Akita and Hachinohe regularly list between ¥1.5 million and ¥3 million (roughly $10,000–$20,000). Our breakdown of the [cheapest places to buy a house in Japan](/blog/cheapest-places-to-buy-a-house-in-japan-2026) shows real current examples.
 
       ## Step 2: Find the property
 
@@ -214,7 +214,7 @@ export const blogPosts = [
 
       ## Your next step
 
-      Buying in Japan is genuinely open to foreigners — the buyers who succeed are the ones who verify before they commit. Browse [current listings](/listings), grab the [free buying guide](/guide), or [book a free consultation](/booking) and we will sanity-check your plan before you spend anything.
+      Buying in Japan is genuinely open to foreigners — the buyers who succeed are the ones who verify before they commit. Browse [current listings](/listings), grab the [free buying guide](/guide), or [book a free consultation](/booking) and we will review your plan with you before you commit to anything.
     `,
   },
   {
