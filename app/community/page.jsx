@@ -72,6 +72,38 @@ function CommunityGate({ user }) {
             </div>
           </div>
 
+          {/* Follow-us announcement (public gate view) */}
+          <div className="border border-brand-border bg-brand-light/40 p-6 mb-16 flex flex-col items-center gap-3 text-center">
+            <p className="text-xs uppercase tracking-wide text-brand-accent">
+              📣 From the Japan Cheap Houses team
+            </p>
+            <h2 className="font-serif text-2xl text-brand">We're now on Instagram &amp; TikTok!</h2>
+            <p className="text-sm text-brand-gray max-w-xl">
+              We post new cheap houses and akiya as short videos — house tours, price
+              reveals and buying tips for foreign buyers. Follow{' '}
+              <strong>@japancheaphouses</strong> so you never miss a listing.
+            </p>
+            <div className="flex gap-3 mt-1">
+              <a
+                href="https://www.instagram.com/japancheaphouses/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn-primary flex items-center gap-2 text-sm"
+              >
+                <Instagram className="h-4 w-4" />
+                Instagram
+              </a>
+              <a
+                href="https://www.tiktok.com/@japancheaphouses"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn-secondary flex items-center gap-2 text-sm"
+              >
+                TikTok
+              </a>
+            </div>
+          </div>
+
           <div className="mb-16">
             <h2 className="font-serif text-2xl text-brand text-center mb-8">
               Discussion Categories
