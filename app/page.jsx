@@ -12,7 +12,7 @@ import { MEMBERSHIPS_ENABLED } from '@/lib/membership';
 // Featured listings: real scraped properties with photos that still load
 // (the hand-written static listings have no photos at all, which left this
 // section showing placeholder art). Falls back to the static entries.
-const FEATURED_IDS = [48, 11, 66]; // Akita station 6DK, Hachinohe 4DK, Akita 9DK garden house
+const FEATURED_IDS = [20, 52, 51]; // Hachinohe 6DK, Akita 6DK, Akita 7DK — kept different from the reel/blog-cover houses (48, 11, 66) so the same homes don't repeat everywhere
 
 async function loadFeaturedListings() {
   const fallback = listings.slice(0, 3).map((l) => ({
