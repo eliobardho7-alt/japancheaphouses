@@ -139,7 +139,7 @@ export const blogPosts = [
     author: 'Elio Bardho',
     excerpt:
       'Foreigners can buy a house in Japan with no visa and no residency. Here is the full process, the real costs, and the mistakes to avoid, step by step.',
-    coverImage: null,
+    coverImage: 'https://akiya.city.hachinohe.aomori.jp/fs/5/4/4/0/_/__.jpg',
     isPremium: false,
     tags: ['buying guide', 'foreigners', 'akiya', 'process'],
     content: `
@@ -227,7 +227,7 @@ export const blogPosts = [
     author: 'Elio Bardho',
     excerpt:
       "Japan has about 9 million empty houses. What akiya really are, why some cost less than a car, what can go wrong, and how foreigners buy them safely.",
-    coverImage: null,
+    coverImage: 'https://www.city.akita.lg.jp/_res/projects/default_project/_page_/001/051/169/08003gaikan1.jpg',
     isPremium: false,
     tags: ['akiya', 'buying guide', 'risks'],
     content: `
@@ -292,7 +292,7 @@ export const blogPosts = [
     author: 'Elio Bardho',
     excerpt:
       'Where are the cheapest houses in Japan actually sold? Real 2026 listing prices from Akita and Hachinohe to rural Kyushu — and what daily life costs there.',
-    coverImage: null,
+    coverImage: 'https://www.city.akita.lg.jp/_res/projects/default_project/_page_/001/047/718/07016gaikan.jpg',
     isPremium: false,
     tags: ['cheap houses', 'akita', 'aomori', 'regions'],
     content: `
