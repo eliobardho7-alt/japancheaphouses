@@ -236,7 +236,7 @@ export default function MapView() {
           {isSubscribed && (
             <div className="bg-green-50 border border-green-200 p-3">
               <p className="text-xs text-green-800">
-                ✓ Premium access — viewing all listings
+                {MEMBERSHIPS_ENABLED ? '✓ Premium access — viewing all listings' : '✓ Free access — viewing all listings'}
               </p>
             </div>
           )}
@@ -272,7 +272,7 @@ export default function MapView() {
                         className="w-full h-32 object-cover mb-2"
                       />
                     )}
-                    {listing.isPremium && (
+                    {MEMBERSHIPS_ENABLED && listing.isPremium && (
                       <span className="inline-flex items-center gap-1 bg-brand-accent text-white text-xs px-2 py-0.5 mb-2">
                         <Lock className="h-3 w-3" />
                         Premium

@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { Lock, Calendar, Clock, Heart } from 'lucide-react';
 import { blogPosts as staticPosts, categories } from '@/data/blogs';
 import { supabase } from '@/lib/supabase';
+import { MEMBERSHIPS_ENABLED } from '@/lib/membership';
 
 export default function BlogPage() {
   const [activeCategory, setActiveCategory] = useState('All Posts');
@@ -85,7 +86,7 @@ export default function BlogPage() {
                 <div className="md:col-span-1">
                   <Link href={`/blog/${post.slug}`}>
                     <div className="relative aspect-[4/3] bg-gradient-to-br from-gray-200 to-gray-300 overflow-hidden">
-                      {post.isPremium && (
+                      {MEMBERSHIPS_ENABLED && post.isPremium && (
                         <div className="absolute top-3 right-3 z-10 bg-brand-accent text-white px-2 py-1 text-xs flex items-center gap-1">
                           <Lock className="h-3 w-3" />
                           Premium

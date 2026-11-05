@@ -116,6 +116,7 @@ export default function ListingsPage() {
                 <Filter className="h-4 w-4" />
                 <span>{filteredListings.length} of {allListings.length} listings</span>
               </div>
+{MEMBERSHIPS_ENABLED && (
               <label className="flex items-center gap-2 text-sm text-brand cursor-pointer">
                 <input
                   type="checkbox"
@@ -125,6 +126,7 @@ export default function ListingsPage() {
                 />
                 Show only free-access listings
               </label>
+              )}
             </div>
             <div className="flex items-center gap-2 flex-wrap">
               <span className="text-xs uppercase tracking-wider text-brand-gray">Prefecture:</span>
@@ -183,13 +185,13 @@ export default function ListingsPage() {
                       <span className="text-6xl opacity-30">🏡</span>
                     </div>
                   )}
-                  {listing.isPremium && (
+                  {MEMBERSHIPS_ENABLED && listing.isPremium && (
                     <div className="absolute top-3 right-3 z-10 bg-brand-accent text-white px-2 py-1 text-xs flex items-center gap-1">
                       <Lock className="h-3 w-3" />
                       Premium
                     </div>
                   )}
-                  {!listing.isPremium && (
+                  {MEMBERSHIPS_ENABLED && !listing.isPremium && (
                     <div className="absolute top-3 right-3 z-10 bg-green-600/90 text-white px-2 py-1 text-xs">
                       Free
                     </div>
@@ -231,7 +233,7 @@ export default function ListingsPage() {
 
           {filteredListings.length === 0 && (
             <div className="text-center py-16 text-brand-gray text-sm">
-              No listings match your filters. Try changing the prefecture or clearing "free only".
+              No listings match your filters. Try changing the prefecture or clearing your filters.
             </div>
           )}
 
