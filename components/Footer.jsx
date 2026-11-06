@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { useState } from 'react';
-import { Mail, Linkedin, Instagram } from 'lucide-react';
+import { Mail, Linkedin, Instagram, Facebook } from 'lucide-react';
 
 const CURRENT_YEAR = new Date().getFullYear();
 
@@ -109,6 +109,15 @@ export default function Footer() {
                 aria-label="Instagram — @japancheaphouses"
               >
                 <Instagram className="h-5 w-5" />
+              </a>
+              <a
+                href="https://www.facebook.com/profile.php?id=61596108758460"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-brand-gray hover:text-brand-accent transition-base"
+                aria-label="Facebook — Japan Cheap Houses"
+              >
+                <Facebook className="h-5 w-5" />
               </a>
               <a
                 href="https://www.tiktok.com/@japancheaphouses"
